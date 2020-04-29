@@ -57,7 +57,7 @@ class MultiChannelSale(models.Model):
 		count = 0
 		woocommerce = self.get_woocommerce_connection()
 		if isinstance(woocommerce, dict):raise UserError("Could not connect with Woocommerce API!")
-		self.import_woocommerce_categories()
+		# self.import_woocommerce_categories()
 		pagination_info = self.pagination_info
 		limit = self.api_record_limit
 		if not pagination_info:
@@ -72,7 +72,7 @@ class MultiChannelSale(models.Model):
 				url = 'customers?page='+str(i)
 				if limit:
 					url += '&per_page=%s'%(limit)
-				partner_data = woocommerce.get(url).json()
+				partner_data = woocommerce.get(url)
 				if 'message' in partner_data:
 					raise UserError(_("Error : "+str(partner_data['message'])))
 				else :

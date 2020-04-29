@@ -64,6 +64,7 @@ class MultiChannelSale(models.Model):
 
     @api.multi
     def import_woocommerce_attribute(self, woocommerce=False):
+        global product_attributes_obj
         _logger.info("==================== Now In Import Woocomerce Attribute ===================")
         attribute_list = []
         odoo_attribute_id = 0
@@ -87,13 +88,13 @@ class MultiChannelSale(models.Model):
                         if not attribute_map:
                             product_attributes_obj = self.env['product.attribute']
                         if attribute['name']:
-                            attribute_search_record = product_attributes_obj.search(
+                            attribute_search_record = self.env['product.attribute'].search(
                                     ['|', ('name', '=', attribute['name']),
                                      '|', ('name', '=', attribute['name'].lower()),
                                      '|', ('name', '=', attribute['name'].title()),
                                           ('name', '=', attribute['name'].upper())])
                             if not attribute_search_record:
-                                odoo_attribute_id = product_attributes_obj.create({'name': attribute['name']})
+                                odoo_attribute_id = self.env['product.attribute'].create({'name': attribute['name']})
                             else:
                                 odoo_attribute_id = attribute_search_record
                             attribute_list.append({
@@ -261,7 +262,7 @@ class MultiChannelSale(models.Model):
             woocommerce = woo_instance
         if not woocommerce:
             woocommerce = self.get_woocommerce_connection()
-        self.import_woocommerce_categories()
+        # self.import_woocommerce_categories()
         pagination_info = self.pagination_info
         limit = self.api_record_limit
         if not pagination_info:

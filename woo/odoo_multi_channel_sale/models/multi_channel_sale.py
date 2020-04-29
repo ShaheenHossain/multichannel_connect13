@@ -6,7 +6,7 @@ from io import StringIO, BytesIO
 from PIL import Image
 import requests
 from odoo import fields, models, api, _
-from custom.woo.odoo_multi_channel_sale.tools import chunks,  DomainVals, ReverseDict
+from custom.woocommerce_v11.woo.odoo_multi_channel_sale.tools import chunks,  DomainVals, ReverseDict
 _logger = logging.getLogger(__name__)
 
 HelpImportOrderDate  = _(

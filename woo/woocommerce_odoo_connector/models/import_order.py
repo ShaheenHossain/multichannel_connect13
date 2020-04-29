@@ -3,7 +3,7 @@
 from odoo import api,fields,models
 from odoo.tools.translate import _
 from datetime import datetime,timedelta
-from custom.woo.odoo_multi_channel_sale.tools import extract_list as EL
+from custom.woocommerce_v11.woo.odoo_multi_channel_sale.tools import extract_list as EL
 from odoo.exceptions import UserError
 import logging
 _logger	 = logging.getLogger(__name__)
