@@ -72,7 +72,7 @@ class MultiChannelSale(models.Model):
 				url = 'customers?page='+str(i)
 				if limit:
 					url += '&per_page=%s'%(limit)
-				partner_data = woocommerce.get(url)
+				partner_data = woocommerce.get(url).json()
 				if 'message' in partner_data:
 					raise UserError(_("Error : "+str(partner_data['message'])))
 				else :

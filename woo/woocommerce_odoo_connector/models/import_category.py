@@ -89,8 +89,8 @@ class MultiChannelSale(models.Model):
 				raise UserError(_("Error : ")+category_data.get('message'))
 			category_data = [category_data,]
 		for category in category_data:
-			if category['parent'] and not category_map_data.search([('store_category_id','=',category['parent']),('channel_id.id','=',self.id)]):
-				self.import_woocommerce_all_categories(False,category['parent'])
+			# if category['parent'] and not category_map_data.search([('store_category_id','=',category['parent']),('channel_id.id','=',self.id)]):
+			# 	self.import_woocommerce_all_categories(False,category['parent'])
 			if not category_map_data.search([('store_category_id','=',category['id']),('channel_id.id','=',self.id)]) and not self.env['category.feed'].search([('store_id','=',category['id']),('channel_id.id','=',self.id)]):
 				category_search_record = self.env['product.category'].search([('name','=',category['name']),('channel_category_ids.instance_id.id','=',self.id)])
 				if category_search_record:
