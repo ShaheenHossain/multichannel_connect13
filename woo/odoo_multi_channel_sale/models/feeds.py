@@ -4,7 +4,7 @@ import copy
 from collections import Counter
 from odoo import fields, models, api, _
 from odoo.exceptions import RedirectWarning, ValidationError, Warning
-from woocommerce_v11.woo.odoo_multi_channel_sale.tools import parse_float, extract_list as EL
+from custom.woocommerce_v11.woo.odoo_multi_channel_sale.tools import parse_float, extract_list as EL
 import logging
 
 _logger = logging.getLogger(__name__)
