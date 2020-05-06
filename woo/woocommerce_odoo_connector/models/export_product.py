@@ -47,9 +47,9 @@ class MultiChannelSale(models.Model):
 					if template.product_variant_ids[0].attribute_value_ids:
 						variable = 1
 				if variable:
-					count += self.create_woocommerce_variable_product(template, woocommerce)
+					count = str(self.create_woocommerce_variable_product(template, woocommerce))
 				else:
-					count += self.create_woocommerce_simple_product(template, woocommerce)
+					count = str(self.create_woocommerce_simple_product(template, woocommerce))
 		return self.display_message(str(count)+" Products have been exported")
 
 	# @api.multi
@@ -289,7 +289,7 @@ class MultiChannelSale(models.Model):
 				product_dict['weight']=str(template.weight)
 			if woocommerce:
 				return_dict  = woocommerce.post('products',product_dict).json()
-			if 	'id' in return_dict:
+			if 'id' in return_dict:
 				mapping_dict = {
 							'channel_id'		: self.id,
 							'store_product_id'	: return_dict['id'],
@@ -312,9 +312,9 @@ class MultiChannelSale(models.Model):
 				obj = self.env['channel.product.mappings']
 				self._create_mapping(obj, mapping_dict)
 				return 1
-			else:
-				raise UserError(_('Simple Product Creation Failed'))
-		raise UserError(_('Simple Product Creation Failed'))
+		# 	else:
+		# 		raise UserError(_('Simple Product Creation Failed'))
+		# raise UserError(_('Simple Product Creation Failed'))
 
 	@api.multi
 	def set_woocommerce_product_categories(self, template):
@@ -348,8 +348,8 @@ class MultiChannelSale(models.Model):
 
 	@api.multi
 	def export_woocommerce_product(self):
-		# self.export_woocommerce_attributes_values()
-		# self.export_woocommerce_categories(0)
+		self.export_woocommerce_attributes_values()
+		self.export_woocommerce_categories(0)
 		# message = self.export_update_woocommerce_product()
 		message =""
 		woocommerce = self.get_woocommerce_connection()
@@ -365,8 +365,8 @@ class MultiChannelSale(models.Model):
 					if template.product_variant_ids[0].attribute_value_ids:
 						variable = 1
 				if variable:
-					count += self.create_woocommerce_variable_product(template, woocommerce)
+					count = str(self.create_woocommerce_variable_product(template, woocommerce))
 				else:
-					count += self.create_woocommerce_simple_product(template, woocommerce)
-		message += 	str(count)+" Products have been exported"
+					count = str(self.create_woocommerce_simple_product(template, woocommerce))
+		message = str(count)+" Products have been exported"
 		return self.display_message(message)

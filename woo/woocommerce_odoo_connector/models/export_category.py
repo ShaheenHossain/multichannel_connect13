@@ -31,8 +31,8 @@ class MultiChannelSale(models.Model):
 		# 		category_records=self.env['product.category'].browse(self._context['active_ids'])
 		# elif not parent_id:
 		category_records = self.env['product.category'].search([])
-		if parent_id:
-			category_records = self.env['product.category'].browse(parent_id)
+		# if parent_id:
+		# 	category_records = self.env['product.category'].browse(parent_id)
 		for category in category_records:
 			mapping_rec = self.env['channel.category.mappings'].search([('odoo_category_id','=',category.id),('channel_id.id','=',self.id)])
 			if mapping_rec and parent_id:
@@ -48,19 +48,20 @@ class MultiChannelSale(models.Model):
 				if parent:
 					category_dict.update({'parent': parent,})
 				return_dict = woocommerce.post('products/categories',category_dict).json()
-				if 'message' in return_dict:
-					raise UserError(_('Error in Creating Categories : '+str(return_dict['message'])))
-				mapping_dict = {
-							'channel_id'		: self.id,
-							'store_category_id'	: return_dict['id'],
-							'odoo_category_id'	: category.id,
-							'category_name'		: category.id,
-							'operation'             : 'export'
-				}
-				obj = self.env['channel.category.mappings']
-				self._create_mapping(obj, mapping_dict)
-				if parent_id:
-					return return_dict['id']
+				# if 'message' in return_dict:
+				# 	raise UserError(_('Error in Creating Categories : '+str(return_dict['message'])))
+				if 'id' in return_dict:
+					mapping_dict = {
+								'channel_id'		: self.id,
+								'store_category_id'	: return_dict['id'],
+								'odoo_category_id'	: category.id,
+								'category_name'		: category.id,
+								'operation'             : 'export'
+					}
+					obj = self.env['channel.category.mappings']
+					self._create_mapping(obj, mapping_dict)
+					# if parent_id:
+					# return return_dict['id']
 		self._cr.commit()
 		return count
 
@@ -79,17 +80,18 @@ class MultiChannelSale(models.Model):
 				if parent:
 					category_dict.update({'parent': parent,})
 				return_dict = woocommerce.post('products/categories',category_dict).json()
-				if 'message' in return_dict:
-					raise UserError(_('Error in Creating Categories : '+str(return_dict['message'])))
-				mapping_dict = {
-							'channel_id'		: self.id,
-							'store_category_id'	: return_dict['id'],
-							'odoo_category_id'	: category.id,
-							'category_name'		: category.id,
-							'operation'         : 'export'
-				}
-				obj = self.env['channel.category.mappings']
-				self._create_mapping(obj, mapping_dict)
-				self._cr.commit()
-				return return_dict['id']
+				# if 'message' in return_dict:
+				# 	raise UserError(_('Error in Creating Categories : '+str(return_dict['message'])))
+				if 'id' in return_dict:
+					mapping_dict = {
+								'channel_id'		: self.id,
+								'store_category_id'	: return_dict['id'],
+								'odoo_category_id'	: category.id,
+								'category_name'		: category.id,
+								'operation'         : 'export'
+					}
+					obj = self.env['channel.category.mappings']
+					self._create_mapping(obj, mapping_dict)
+					self._cr.commit()
+					return return_dict['id']
 		return False

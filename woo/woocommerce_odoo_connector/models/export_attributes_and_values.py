@@ -33,8 +33,8 @@ class MultiChannelSale(models.Model):
 															'products/attributes/'+str(attribute_id)+"/terms",
 															attribute_value_dict
 														).json()
-					if 'message' in return_value_dict:
-						raise UserError(_('Error in Creating terms '+str(return_value_dict['message'])))
+					# if 'message' in return_value_dict:
+					# 	raise UserError(_('Error in Creating terms '+str(return_value_dict['message'])))
 					attr_val += 1
 					mapping_dict={
 								'channel_id'				: self.id,

@@ -13,11 +13,12 @@
 				<xpath expr="//group[@name='import_buttons']" position='inside'>
 					<separator string="Import From WooCommerce" colspan="4" attrs="{'invisible':[('channel','!=','woocommerce')]}" />
 					<group attrs="{'invisible':[('channel','!=','woocommerce')]}" col="4" >
-	                	<button
+	                	<div>
+							<button
 	                    attrs= "{'invisible':['!',('channel','!=', 'WooCommerce'),('state','!=','validate')]}"
 	                    name="woocommerce_odoo_connector.action_customer_import_update_form_view"
 	                    type="action"
-						style="height:100px;margin:0 5px;"
+						style="height:100px;margin:10px 5px;"
 	                    class="oe_highlight wk_operation_btn box oe_left"
 	                    icon="fa-5x fa-user "
 	                    help="It will import Customers on Odoo from WooCommerce"
@@ -37,13 +38,15 @@
 	                    help="It will import Categories on Odoo from WooCommerce">
 	                    <span> Import/Update Categories</span> <span> <i class='fa fa-fw fa-cloud-download'/></span>
 	                	</button>
-						<button
+						</div>
+						<div>
+							<button
 	                    attrs= "{'invisible':['!',('channel','!=', 'WooCommerce'),('state','!=','validate')]}"
 	                    name="woocommerce_odoo_connector.action_import_update_form_view"
 	                    type="action"
 	                    class="oe_highlight wk_operation_btn box oe_left"
 	                    icon="fa-5x fa-dropbox"
-						style="height:100px;margin:0 5px;"
+						style="height:100px;margin:10px 5px;"
 						aria-label="Import Products"
 						title="Import Products"
 	                    help="It will import Products on Odoo from WooCommerce">
@@ -61,6 +64,7 @@
 	                    help="It will import Orders on Odoo from WooCommerce">
 	                    <span> Import/Update Orders</span> <span> <i class='fa fa-fw fa-cloud-download'/></span>
 	                	</button>
+						</div>
 					</group>
 									<!-- Export -->
 					<separator string="Export To WooCommerce"  colspan="4" attrs="{'invisible':[('channel','!=','woocommerce')]}" />

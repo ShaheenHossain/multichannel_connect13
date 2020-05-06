@@ -4,7 +4,7 @@ import copy
 from collections import Counter
 from odoo import fields, models, api, _
 from odoo.exceptions import RedirectWarning, ValidationError, Warning
-from custom.woocommerce_v11.woo.odoo_multi_channel_sale.tools import parse_float, extract_list as EL
+from woocommerce_v11.woo.odoo_multi_channel_sale.tools import parse_float, extract_list as EL
 import logging
 
 _logger = logging.getLogger(__name__)
@@ -28,7 +28,7 @@ ProductFields = Fields + [
     'extra_categ_ids',
     'list_price',
     'image_url',
-    'image',
+    'image_medium',
     'default_code',
     'barcode',
     'type',
@@ -656,7 +656,7 @@ class ProductVaraintFeed(models.Model):
     wk_product_id_type = fields.Char(
         string='Product ID Type'
     )
-    image = fields.Binary(
+    image_medium = fields.Binary(
         string='Image'
     )
     image_url = fields.Char(
@@ -755,13 +755,13 @@ class ProductFeed(models.Model):
     def get_variant_extra_values(self, template_id, variant, channel_id):
         vals = {}
         state = 'done'
-        if variant.image:
-            vals.update({'image': variant.image})
+        if variant.image_medium:
+            vals.update({'image_medium': variant.image_medium})
         else:
             image_url = variant.image_url
             if image_url and (image_url not in ['false', 'False', False]):
                 image_res = channel_id.read_website_image_url(image_url)
-                if image_res: vals['image'] = image_res
+                if image_res: vals['image_medium'] = image_res
         if variant.description_sale:
             vals['description_sale'] = variant.description_sale
         weight_unit = variant.weight_unit
@@ -954,7 +954,7 @@ class ProductFeed(models.Model):
         list_price = list_price and parse_float(list_price) or 0
         image_url = vals.pop('image_url')
         location_id = channel_id.location_id
-        if not vals.get('image') and image_url and (image_url not in ['false', 'False', False]):
+        if not vals.get('image_medium') and image_url and (image_url not in ['false', 'False', False]):
             image_res = channel_id.read_website_image_url(image_url)
             if image_res: vals['image'] = image_res
         match = channel_id.match_template_mappings(store_id, **vals)
