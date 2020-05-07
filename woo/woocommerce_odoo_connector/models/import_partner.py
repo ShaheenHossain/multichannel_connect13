@@ -69,9 +69,11 @@ class MultiChannelSale(models.Model):
 		try:
 			i=pagination_info.get("import_partner_last_page",1)
 			while(i):
-				url = 'customers?page='+str(i)
-				if limit:
-					url += '&per_page=%s'%(limit)
+				url = 'customers'
+				# url = 'customers?page='+str(i)
+				# if limit:
+				# 	url += '&per_page=%s'%(limit)
+				# partner_data = woocommerce.get(url)
 				partner_data = woocommerce.get(url).json()
 				if 'message' in partner_data:
 					raise UserError(_("Error : "+str(partner_data['message'])))
