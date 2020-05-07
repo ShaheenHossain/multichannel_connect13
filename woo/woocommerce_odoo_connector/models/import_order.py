@@ -225,11 +225,11 @@ class MultiChannelSale(models.Model):
 
 	@api.multi
 	def import_all_woocommerce_orders(self):
-		self.import_woocommerce_attribute()
-		self.import_woocommerce_categories()
+		# self.import_woocommerce_attribute()
+		# self.import_woocommerce_categories()
 		woocommerce = self.get_woocommerce_connection()
 		message = ''
-		self.woc_check_and_create_tax(woocommerce)
+		# self.woc_check_and_create_tax(woocommerce)
 		list_order = []
 		count = 0
 		context = dict(self._context)
@@ -242,98 +242,100 @@ class MultiChannelSale(models.Model):
 			pagination_info = eval(pagination_info)
 		try:
 			i=pagination_info.get("import_order_last_page",1)			
-			while(i):
-				url = 'orders?page='+str(i)
-				if limit:
-					url += '&per_page=%s'%(limit)
-				order_data = woocommerce.get(url).json()
-				if 'errors' in order_data:
-					raise UserError(_("Error : "+str(order_data['errors'][0]['message'])))
-				else :
-					if order_data:
-						i=i+1
-						for order in order_data:
-							_logger.info("===============================>%r",order['id'])
-							if not order_feed_data.search([('store_id','=',order['id']),('channel_id.id','=',self.id)]):
-								count = count + 1
-								if order['id']:
-									woocommerce2 = woocommerce
-									if woocommerce2:
-										order_data = woocommerce2.get("orders/"+str(order['id'])).json()
-										data = order_data['line_items']
-										order_lines = self.get_woocommerce_order_line(data)
-										if order['shipping_lines']:
-											order_lines += self.create_or_get_woocommerce_shipping(order_data['shipping_lines'])
-										# if order['coupon_lines']:
-										# 	order_lines += self.create_or_get_woocommerce_voucher(order['coupon_lines'])
-										
-								customer ={}
-								if order['customer_id']:
-									customer = woocommerce.get('customers/'+str(order['customer_id'])).json()
-								else:
-									customer.update({'first_name':order['billing']['first_name'],'last_name':order['billing']['last_name'],'email':order['billing']['email'] })
-								_logger.info("===================>%r",[order['billing'],order['shipping'],customer,order])
-								method_title ='Delivery'
-								if order['shipping_lines']:
-									method_title = order['shipping_lines'][0]['method_title']
-								order_dict={
-											'store_id'		 : order['id'],
-											'channel_id'	 : self.id,
-											'partner_id'	 : order['customer_id'] or order['billing']['email'],
-											'payment_method' : order['payment_method_title'],
-											'line_type'		 : 'multi',
-											'carrier_id'	 : method_title,
-											'line_ids'		 : order_lines,
-											'currency'		 : order['currency'],
-											'customer_name'  : customer['first_name'] +" "+customer['last_name'],
-											'customer_email' : customer['email'],
-											'order_state'	 : order['status'],
-											}
-								if order['billing']:
-									order_dict.update({
-													'invoice_partner_id': order['billing']['email'],
-													'invoice_name'	   	: order['billing']['first_name']+" "+order['billing']['last_name'],
-													'invoice_email'    	: order['billing']['email'],
-													'invoice_phone'    	: order['billing']['phone'],
-													'invoice_street'   	: order['billing']['address_1'],
-													'invoice_street2'  	: order['billing']['address_2'],
-													'invoice_zip'	   	: order['billing']['postcode'],
-													'invoice_city'	   	: order['billing']['city'],
-													'invoice_state_id' 	: order['billing']['state'],
-													'invoice_country_id': order['billing']['country'],
-													})
-								if order['shipping']:
-									order_dict['same_shipping_billing'] = False
-									order_dict.update({
-													'shipping_partner_id'   :order['billing']['email'],
-													'shipping_name'	   		:order['shipping']['first_name']+" "+order['billing']['last_name'],
-													'shipping_street'   	:order['shipping']['address_1'],
-													'shipping_street2'  	:order['shipping']['address_2'],
-													'shipping_email'		:order['billing']['email'],
-													'shipping_zip'	   		:order['shipping']['postcode'],
-													'shipping_city'	   		:order['shipping']['city'],
-													'shipping_state_id' 	:order['shipping']['state'],
-													'shipping_country_id'	:order['shipping']['country'],
-													})
-								order_rec = order_feed_data.with_context(context).create(order_dict)
-								self._cr.commit()
-								list_order.append(order_rec)
-								list_order.reverse()
-								if limit:
-									feed_res = dict(create_ids=list_order,update_ids=[])
-									self.env['channel.operation'].post_feed_import_process(self,feed_res)
-								pagination_info["import_order_last_page"] = i
-								self.write({
-									"pagination_info":pagination_info
-								})
-								self._cr.commit()
-					else:
-						i=0
-						pagination_info["import_order_last_page"] = 1
-						self.write({
-							"pagination_info":pagination_info
-						})
-						self._cr.commit()
+			# while(i):
+			url = 'orders'
+			# url = 'orders?page='+str(i)
+			# if limit:
+				# url += '&per_page=%s'%(limit)
+			order_data = woocommerce.get(url).json()
+			if 'errors' in order_data:
+				raise UserError(_("Error : "+str(order_data['errors'][0]['message'])))
+			else :
+				if order_data:
+					i=i+1
+					for order in order_data:
+						_logger.info("===============================>%r",order['id'])
+						if not order_feed_data.search([('store_id','=',order['id']),('channel_id.id','=',self.id)]):
+							count = count + 1
+							if order['id']:
+								woocommerce2 = woocommerce
+								if woocommerce2:
+									order_data = woocommerce2.get("orders/"+str(order['id'])).json()
+									data = order_data['line_items']
+									order_lines = self.get_woocommerce_order_line(data)
+									if order['shipping_lines']:
+										order_lines += self.create_or_get_woocommerce_shipping(order_data['shipping_lines'])
+									# if order['coupon_lines']:
+									# 	order_lines += self.create_or_get_woocommerce_voucher(order['coupon_lines'])
+
+							customer ={}
+							if order['customer_id']:
+								customer = woocommerce.get('customers/'+str(order['customer_id'])).json()
+							else:
+								customer.update({'first_name':order['billing']['first_name'],'last_name':order['billing']['last_name'],'email':order['billing']['email'] })
+							_logger.info("===================>%r",[order['billing'],order['shipping'],customer,order])
+							method_title ='Delivery'
+							if order['shipping_lines']:
+								method_title = order['shipping_lines'][0]['method_title']
+							order_dict={
+										'store_id'		 : order['id'],
+										'channel_id'	 : self.id,
+										'partner_id'	 : order['customer_id'] or order['billing']['email'],
+										'payment_method' : order['payment_method_title'],
+										'line_type'		 : 'multi',
+										'carrier_id'	 : method_title,
+										'line_ids'		 : order_lines,
+										'currency'		 : 'EUR',
+										# 'currency'		 : order['currency'],
+										'customer_name'  : customer['first_name'] +" "+customer['last_name'],
+										'customer_email' : customer['email'],
+										'order_state'	 : order['status'],
+										}
+							if order['billing']:
+								order_dict.update({
+												'invoice_partner_id': order['billing']['email'],
+												'invoice_name'	   	: order['billing']['first_name']+" "+order['billing']['last_name'],
+												'invoice_email'    	: order['billing']['email'],
+												'invoice_phone'    	: order['billing']['phone'],
+												'invoice_street'   	: order['billing']['address_1'],
+												'invoice_street2'  	: order['billing']['address_2'],
+												'invoice_zip'	   	: order['billing']['postcode'],
+												'invoice_city'	   	: order['billing']['city'],
+												'invoice_state_id' 	: order['billing']['state'],
+												'invoice_country_id': order['billing']['country'],
+												})
+							if order['shipping']:
+								order_dict['same_shipping_billing'] = False
+								order_dict.update({
+												'shipping_partner_id'   :order['billing']['email'],
+												'shipping_name'	   		:order['shipping']['first_name']+" "+order['billing']['last_name'],
+												'shipping_street'   	:order['shipping']['address_1'],
+												'shipping_street2'  	:order['shipping']['address_2'],
+												'shipping_email'		:order['billing']['email'],
+												'shipping_zip'	   		:order['shipping']['postcode'],
+												'shipping_city'	   		:order['shipping']['city'],
+												'shipping_state_id' 	:order['shipping']['state'],
+												'shipping_country_id'	:order['shipping']['country'],
+												})
+							order_rec = order_feed_data.with_context(context).create(order_dict)
+							self._cr.commit()
+							list_order.append(order_rec)
+							list_order.reverse()
+							if limit:
+								feed_res = dict(create_ids=list_order,update_ids=[])
+								self.env['channel.operation'].post_feed_import_process(self,feed_res)
+							pagination_info["import_order_last_page"] = i
+							self.write({
+								"pagination_info":pagination_info
+							})
+							self._cr.commit()
+				else:
+					i=0
+					pagination_info["import_order_last_page"] = 1
+					self.write({
+						"pagination_info":pagination_info
+					})
+					self._cr.commit()
 			context.update({'group_by':'state',
 						})
 			self.import_order_date = str(datetime.now().date())
