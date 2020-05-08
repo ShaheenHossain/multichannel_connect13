@@ -192,56 +192,57 @@ class MultiChannelSale(models.Model):
             raise UserError(_("Please set date in multi channel configuration"))
         try:
             i=1
-            while(i):
-                product_data = woocommerce.get('products?after='+date+'&page='+str(i)).json()
-                if 'errors' in product_data:
-                    raise UserError(_("Error : "+str(product_data['errors'][0]['message'])))
-                else :
-                    if product_data:
-                        i = i+1
-                        for product in product_data:
-                            variants = []
-                            if not self.env['channel.template.mappings'].search([('store_product_id','=',product['id']),('channel_id.id','=',self.id)]):
-                                categ = ""
-                                if product['type'] == 'variable':
-                                    variants = self.create_woocommerce_variants(woocommerce,product['id'], product['variations'])
-                                count = count + 1
-                                for category in product['categories']:
-                                    category_id = self.env['channel.category.mappings'].search([('store_category_id','=',category['id']),('channel_id.id','=',self.id)])
-                                    if category_id:
-                                        categ = categ+str(category_id.store_category_id)+","
-                                try:
-                                    product['price']=float(product['price'])
-                                except:
-                                    pass
-                                product_feed_dict = {'name'				: product['name'],
-                                                'store_id'				: product['id'],
-                                                'default_code' 			: product['sku'],
-                                                'list_price'			: product['price'],
-                                                'channel_id'			: self.id,
-                                                'description_sale'		: remove_tag.sub('',product['description']),
-                                                'qty_available' 		: product['stock_quantity'],
-                                                'feed_variants' 		: variants,
-                                                'image_url'				: product['images'][0]['src'],
-                                                'extra_categ_ids'		: categ or '',
-                                                #'ecom_store'			: 'woocommerce',
-                                                }
-                                if not product['type'] == 'variable':
-                                    product_feed_dict.update({
-                                                'weight'				: product['weight'] or "",
-                                                # 'weight_unit'			: 'kg',
-                                                'length'				: product['dimensions']['length'] or "",
-                                                'width'					: product['dimensions']['width'] or "",
-                                                'height'				: product['dimensions']['height'] or "",
-                                                # 'dimension_unit'		: product['dimensions']['unit'] or "",
-                                    })
-                                if product['downloadable'] == True or product['virtual'] == True:
-                                    product_feed_dict.update({'type':'service'})
-                                product_rec = product_tmpl.create(product_feed_dict)
-                                self._cr.commit()
-                                list_product.append(product_rec)
-                    else:
-                        i=0
+            # while(i):
+            product_data = woocommerce.get('products').json()
+            # product_data = woocommerce.get('products?after='+date+'&page='+str(i)).json()
+            if 'errors' in product_data:
+                raise UserError(_("Error : "+str(product_data['errors'][0]['message'])))
+            else :
+                if product_data:
+                    i = i+1
+                    for product in product_data:
+                        variants = []
+                        if not self.env['channel.template.mappings'].search([('store_product_id','=',product['id']),('channel_id.id','=',self.id)]):
+                            categ = ""
+                            if product['type'] == 'variable':
+                                variants = self.create_woocommerce_variants(woocommerce,product['id'], product['variations'])
+                            count = count + 1
+                            for category in product['categories']:
+                                category_id = self.env['channel.category.mappings'].search([('store_category_id','=',category['id']),('channel_id.id','=',self.id)])
+                                if category_id:
+                                    categ = categ+str(category_id.store_category_id)+","
+                            try:
+                                product['price']=float(product['price'])
+                            except:
+                                pass
+                            product_feed_dict = {'name'				: product['name'],
+                                            'store_id'				: product['id'],
+                                            'default_code' 			: product['sku'],
+                                            'list_price'			: product['price'],
+                                            'channel_id'			: self.id,
+                                            'description_sale'		: remove_tag.sub('',product['description']),
+                                            'qty_available' 		: product['stock_quantity'],
+                                            'feed_variants' 		: variants,
+                                            'image_url'				: product['images'][0]['src'],
+                                            'extra_categ_ids'		: categ or '',
+                                            #'ecom_store'			: 'woocommerce',
+                                            }
+                            if not product['type'] == 'variable':
+                                product_feed_dict.update({
+                                            'weight'				: product['weight'] or "",
+                                            # 'weight_unit'			: 'kg',
+                                            'length'				: product['dimensions']['length'] or "",
+                                            'width'					: product['dimensions']['width'] or "",
+                                            'height'				: product['dimensions']['height'] or "",
+                                            # 'dimension_unit'		: product['dimensions']['unit'] or "",
+                                })
+                            if product['downloadable'] == True or product['virtual'] == True:
+                                product_feed_dict.update({'type':'service'})
+                            product_rec = product_tmpl.create(product_feed_dict)
+                            self._cr.commit()
+                            list_product.append(product_rec)
+                else:
+                    i=0
 
             feed_res = dict(create_ids=list_product,update_ids=[])
             self.env['channel.operation'].post_feed_import_process(self,feed_res)

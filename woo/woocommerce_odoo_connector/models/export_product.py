@@ -81,7 +81,7 @@ class MultiChannelSale(models.Model):
 			image_list.append({
 				'src'		: 'http://localhost:8017/channel/image/product.product/45/image/492x492.png',
 				'name'		: name,
-				'position'	: 0,
+				'alt'	    : '',
 			})
 			if variant:
 				for variation in template.product_variant_ids:
@@ -276,7 +276,7 @@ class MultiChannelSale(models.Model):
 						'in_stock'			: True,
 			}
 			if template.image:
-				product_dict['image_medium'] = self.create_woocommerce_product_image(template)
+				product_dict['images'] = self.create_woocommerce_product_image(template)
 			if template.length or template.width or template.height:
 				dimensions = {
 								u'width': str(template.width)  or "", 
