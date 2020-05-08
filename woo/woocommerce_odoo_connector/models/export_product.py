@@ -68,7 +68,7 @@ class MultiChannelSale(models.Model):
 	@api.multi
 	def set_woocommerce_image_path(self, name, product):
 		base_url = self.env['ir.config_parameter'].get_param('web.base.url')
-		image_url = '/channel/image/product.product/%s/image/%s.png'%(product.id,name)
+		image_url = '/channel/image/product.product/%s/image/492x492.png'%(product.id)
 		full_image_url = '%s' % urlparse.urljoin(base_url,image_url)
 		return full_image_url,name
 
@@ -79,7 +79,7 @@ class MultiChannelSale(models.Model):
 			count = 0
 			template_url,name = self.set_woocommerce_image_path(template.name, template.product_variant_ids[0])
 			image_list.append({
-				'src'		: template_url,
+				'src'		: 'http://localhost:8017/channel/image/product.product/45/image/492x492.png',
 				'name'		: name,
 				'position'	: 0,
 			})
@@ -276,7 +276,7 @@ class MultiChannelSale(models.Model):
 						'in_stock'			: True,
 			}
 			if template.image:
-				product_dict['images'] = self.create_woocommerce_product_image(template)
+				product_dict['image_medium'] = self.create_woocommerce_product_image(template)
 			if template.length or template.width or template.height:
 				dimensions = {
 								u'width': str(template.width)  or "", 
