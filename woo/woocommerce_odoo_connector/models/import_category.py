@@ -23,14 +23,15 @@ class MultiChannelSale(models.Model):
 			category_map_data = self.env['channel.category.mappings']
 			count = 0
 			i=1
-			while(i):
-				cat_url = 'products/categories?page='+str(i)
-				category_data = woocommerce.get(cat_url).json()
-				if category_data:
-					count += self.import_woocommerce_all_categories(cat_url,False)
-					i +=1
-				else:
-					i=0
+			# while(i):
+			cat_url = 'products/categories'
+			# cat_url = 'products/categories?page='+str(i)
+			category_data = woocommerce.get(cat_url).json()
+			if category_data:
+				count += self.import_woocommerce_all_categories(cat_url,False)
+				i +=1
+			else:
+				i=0
 			message += str(count)+" Categories Imported!"
 			_logger.info("==================== Now Out Of Import Woocomerce Category ===================")
 			return self.display_message(message)

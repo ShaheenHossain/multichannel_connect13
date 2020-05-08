@@ -68,7 +68,7 @@ class MultiChannelSale(models.Model):
 	@api.multi
 	def set_woocommerce_image_path(self, name, product):
 		base_url = self.env['ir.config_parameter'].get_param('web.base.url')
-		image_url = '/channel/image/product.product/%s/image/492x492.png'%(product.id)
+		image_url = '/channel/image/product.product/%s/image/%s.png'%(product.id,name)
 		full_image_url = '%s' % urlparse.urljoin(base_url,image_url)
 		return full_image_url,name
 
@@ -265,7 +265,7 @@ class MultiChannelSale(models.Model):
 						'sku' 				: template.default_code or "",
 						'regular_price'		: str(template.with_context(pricelist=self.pricelist_name.id).price) or "",
 						'type'				: 'simple',
-						'categories'		: self.set_woocommerce_product_categories(template),
+						# 'categories'		: self.set_woocommerce_product_categories(template),
 						'status'			: 'publish',
 						'short_description'	: template.description_sale  or "" ,
 						'description'		: template.description or "",
@@ -348,8 +348,8 @@ class MultiChannelSale(models.Model):
 
 	@api.multi
 	def export_woocommerce_product(self):
-		self.export_woocommerce_attributes_values()
-		self.export_woocommerce_categories(0)
+		# self.export_woocommerce_attributes_values()
+		# self.export_woocommerce_categories(0)
 		# message = self.export_update_woocommerce_product()
 		message =""
 		woocommerce = self.get_woocommerce_connection()
