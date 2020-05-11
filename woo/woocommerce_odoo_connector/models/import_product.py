@@ -37,10 +37,10 @@ class MultiChannelSale(models.Model):
                     attr = {'name': str(attributes['name']), 'value': str(attributes['option']),
                             'attrib_name_id': attrib_name_id.store_attribute_id, 'attrib_value_id': attrib_value_ids}
                     attribute_list.append(attr)
-                    if isinstance(variant['image_medium'],list):
+                    if isinstance(variant['image'],list):
                         image = variant['images'][0]['src']
                     else:
-                        image = variant['image_medium']['src']
+                        image = variant['image']['src']
             try:
                 variant['price'] = float(variant['price'])
             except:
