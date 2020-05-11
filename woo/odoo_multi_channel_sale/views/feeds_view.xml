@@ -76,7 +76,7 @@
 	                    	 <page name="general" string="General Info">
 	                    	 	<group>
 	                    	 	<group>
-								<field name="image_medium" widget='image' />
+								<field name="image" widget='image' />
 		                		</group>
 		                		<group>
 		                			<field name="image_url" />
@@ -190,7 +190,7 @@
 	                    	 <page name="general" string="General Info">
 	                    	 	<group>
 	                    	 	<group>
-								<field name="image_medium" widget='image'  attrs= "{'readonly':[('state','=', 'done')]}" />
+								<field name="image" widget='image'  attrs= "{'readonly':[('state','=', 'done')]}" />
 		                		</group>
 		                		<group>
 		                			<field name="image_url" attrs= "{'readonly':[('state','=', 'done')]}"/>
