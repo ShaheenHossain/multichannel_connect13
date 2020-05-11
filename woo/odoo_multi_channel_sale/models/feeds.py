@@ -28,7 +28,7 @@ ProductFields = Fields + [
     'extra_categ_ids',
     'list_price',
     'image_url',
-    'image',
+    'image_medium',
     'default_code',
     'barcode',
     'type',
@@ -656,7 +656,7 @@ class ProductVaraintFeed(models.Model):
     wk_product_id_type = fields.Char(
         string='Product ID Type'
     )
-    image = fields.Binary(
+    image_medium = fields.Binary(
         string='Image'
     )
     image_url = fields.Char(

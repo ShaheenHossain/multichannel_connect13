@@ -37,10 +37,10 @@ class MultiChannelSale(models.Model):
                     attr = {'name': str(attributes['name']), 'value': str(attributes['option']),
                             'attrib_name_id': attrib_name_id.store_attribute_id, 'attrib_value_id': attrib_value_ids}
                     attribute_list.append(attr)
-                    if isinstance(variant['image'],list):
+                    if isinstance(variant['image_medium'],list):
                         image = variant['images'][0]['src']
                     else:
-                        image = variant['image']['src']
+                        image = variant['image_medium']['src']
             try:
                 variant['price'] = float(variant['price'])
             except:
@@ -129,45 +129,45 @@ class MultiChannelSale(models.Model):
         odoo_attribute_value_id = 0
         for attribute in attribute_list:
             i=1
-            while(i):
-                try:
-                    # attribute_term_data = woocommerce.get('products/attributes/'+str(attribute['id'])+'/terms').json()
-                    attribute_term_data = woocommerce.get('products/attributes/'+str(attribute['id'])+'/terms?page='+str(i)).json()
-                except Exception as e:
-                    raise UserError(_("Error : "+str(e)))
-                if 'message' in attribute_term_data:
-                    raise UserError(_("Error : "+str(attribute_term_data['message'])))
-                else :
-                    if attribute_term_data:
-                        i = i+1
-                        for term in attribute_term_data:
-                            term_map = self.env['channel.attribute.value.mappings'].search([('store_attribute_value_id','=',term['id']),('channel_id.id','=',self.id)])
-                            if not term_map:
-                                product_attributes_value_obj = self.env['product.attribute.value']
-                                attribute_value_search_record = product_attributes_value_obj.search([
-                                                                                    ('attribute_id','=',attribute['value']),
-                                                                                    '|',('name','=',term['name']),
-                                                                                    '|',('name','=',term['name'].lower()),
-                                                                                    '|',('name','=',term['name'].title()),
-                                                                                        ('name','=',term['name'].upper())
-                                                                                    ])
-                                if not attribute_value_search_record:
-                                    odoo_attribute_value_id = product_attributes_value_obj.create({'name':term['name'],'attribute_id':attribute['value']})
-                                else:
-                                    odoo_attribute_value_id = attribute_value_search_record
-                                mapping_dict = {
-                                            'channel_id'				: self.id,
-                                            'store_attribute_value_id'	: term['id'],
-                                            'store_attribute_value_name': term['name'],
-                                            'odoo_attribute_value_id'	: odoo_attribute_value_id.id,
-                                            'attribute_value_name'		: odoo_attribute_value_id.id,
-                                            'ecom_store'				: 'woocommerce',
-                                }
-                                obj = self.env['channel.attribute.value.mappings']
-                                self._create_mapping(obj, mapping_dict)
-                                self._cr.commit()
-                    else:
-                        i=0
+            # while(i):
+            try:
+                attribute_term_data = woocommerce.get('products/attributes/'+str(attribute['id'])+'/terms').json()
+                # attribute_term_data = woocommerce.get('products/attributes/'+str(attribute['id'])+'/terms?page='+str(i)).json()
+            except Exception as e:
+                raise UserError(_("Error : "+str(e)))
+            if 'message' in attribute_term_data:
+                raise UserError(_("Error : "+str(attribute_term_data['message'])))
+            else :
+                if attribute_term_data:
+                    i = i+1
+                    for term in attribute_term_data:
+                        term_map = self.env['channel.attribute.value.mappings'].search([('store_attribute_value_id','=',term['id']),('channel_id.id','=',self.id)])
+                        if not term_map:
+                            product_attributes_value_obj = self.env['product.attribute.value']
+                            attribute_value_search_record = product_attributes_value_obj.search([
+                                                                                ('attribute_id','=',attribute['value']),
+                                                                                '|',('name','=',term['name']),
+                                                                                '|',('name','=',term['name'].lower()),
+                                                                                '|',('name','=',term['name'].title()),
+                                                                                    ('name','=',term['name'].upper())
+                                                                                ])
+                            if not attribute_value_search_record:
+                                odoo_attribute_value_id = product_attributes_value_obj.create({'name':term['name'],'attribute_id':attribute['value']})
+                            else:
+                                odoo_attribute_value_id = attribute_value_search_record
+                            mapping_dict = {
+                                        'channel_id'				: self.id,
+                                        'store_attribute_value_id'	: term['id'],
+                                        'store_attribute_value_name': term['name'],
+                                        'odoo_attribute_value_id'	: odoo_attribute_value_id.id,
+                                        'attribute_value_name'		: odoo_attribute_value_id.id,
+                                        'ecom_store'				: 'woocommerce',
+                            }
+                            obj = self.env['channel.attribute.value.mappings']
+                            self._create_mapping(obj, mapping_dict)
+                            self._cr.commit()
+                else:
+                    i=0
         return True
 
     @api.multi
@@ -192,57 +192,57 @@ class MultiChannelSale(models.Model):
             raise UserError(_("Please set date in multi channel configuration"))
         try:
             i=1
-            while(i):
-            # product_data = woocommerce.get('products').json()
-                product_data = woocommerce.get('products?after='+date+'&page='+str(i)).json()
-                if 'errors' in product_data:
-                    raise UserError(_("Error : "+str(product_data['errors'][0]['message'])))
-                else :
-                    if product_data:
-                        i = i+1
-                        for product in product_data:
-                            variants = []
-                            if not self.env['channel.template.mappings'].search([('store_product_id','=',product['id']),('channel_id.id','=',self.id)]):
-                                categ = ""
-                                if product['type'] == 'variable':
-                                    variants = self.create_woocommerce_variants(woocommerce,product['id'], product['variations'])
-                                count = count + 1
-                                for category in product['categories']:
-                                    category_id = self.env['channel.category.mappings'].search([('store_category_id','=',category['id']),('channel_id.id','=',self.id)])
-                                    if category_id:
-                                        categ = categ+str(category_id.store_category_id)+","
-                                try:
-                                    product['price']=float(product['price'])
-                                except:
-                                    pass
-                                product_feed_dict = {'name'				: product['name'],
-                                                'store_id'				: product['id'],
-                                                'default_code' 			: product['sku'],
-                                                'list_price'			: product['price'],
-                                                'channel_id'			: self.id,
-                                                'description_sale'		: remove_tag.sub('',product['description']),
-                                                'qty_available' 		: product['stock_quantity'],
-                                                'feed_variants' 		: variants,
-                                                'image_url'				: product['images'][0]['src'],
-                                                'extra_categ_ids'		: categ or '',
-                                                #'ecom_store'			: 'woocommerce',
-                                                }
-                                if not product['type'] == 'variable':
-                                    product_feed_dict.update({
-                                                'weight'				: product['weight'] or "",
-                                                # 'weight_unit'			: 'kg',
-                                                'length'				: product['dimensions']['length'] or "",
-                                                'width'					: product['dimensions']['width'] or "",
-                                                'height'				: product['dimensions']['height'] or "",
-                                                # 'dimension_unit'		: product['dimensions']['unit'] or "",
-                                    })
-                                if product['downloadable'] == True or product['virtual'] == True:
-                                    product_feed_dict.update({'type':'service'})
-                                product_rec = product_tmpl.create(product_feed_dict)
-                                self._cr.commit()
-                                list_product.append(product_rec)
-                    else:
-                        i=0
+            # while(i):
+            product_data = woocommerce.get('products').json()
+            # product_data = woocommerce.get('products?after='+date+'&page='+str(i)).json()
+            if 'errors' in product_data:
+                raise UserError(_("Error : "+str(product_data['errors'][0]['message'])))
+            else :
+                if product_data:
+                    i = i+1
+                    for product in product_data:
+                        variants = []
+                        if not self.env['channel.template.mappings'].search([('store_product_id','=',product['id']),('channel_id.id','=',self.id)]):
+                            categ = ""
+                            if product['type'] == 'variable':
+                                variants = self.create_woocommerce_variants(woocommerce,product['id'], product['variations'])
+                            count = count + 1
+                            for category in product['categories']:
+                                category_id = self.env['channel.category.mappings'].search([('store_category_id','=',category['id']),('channel_id.id','=',self.id)])
+                                if category_id:
+                                    categ = categ+str(category_id.store_category_id)+","
+                            try:
+                                product['price']=float(product['price'])
+                            except:
+                                pass
+                            product_feed_dict = {'name'				: product['name'],
+                                            'store_id'				: product['id'],
+                                            'default_code' 			: product['sku'],
+                                            'list_price'			: product['price'],
+                                            'channel_id'			: self.id,
+                                            'description_sale'		: remove_tag.sub('',product['description']),
+                                            'qty_available' 		: product['stock_quantity'],
+                                            'feed_variants' 		: variants,
+                                            'image_url'				: product['images'][0]['src'],
+                                            'extra_categ_ids'		: categ or '',
+                                            #'ecom_store'			: 'woocommerce',
+                                            }
+                            if not product['type'] == 'variable':
+                                product_feed_dict.update({
+                                            'weight'				: product['weight'] or "",
+                                            # 'weight_unit'			: 'kg',
+                                            'length'				: product['dimensions']['length'] or "",
+                                            'width'					: product['dimensions']['width'] or "",
+                                            'height'				: product['dimensions']['height'] or "",
+                                            # 'dimension_unit'		: product['dimensions']['unit'] or "",
+                                })
+                            if product['downloadable'] == True or product['virtual'] == True:
+                                product_feed_dict.update({'type':'service'})
+                            product_rec = product_tmpl.create(product_feed_dict)
+                            self._cr.commit()
+                            list_product.append(product_rec)
+                else:
+                    i=0
 
             feed_res = dict(create_ids=list_product,update_ids=[])
             self.env['channel.operation'].post_feed_import_process(self,feed_res)
@@ -278,74 +278,74 @@ class MultiChannelSale(models.Model):
         product_tmpl = self.env['product.feed']
         try:
             i=pagination_info.get("import_product_last_page",1)
-            while(i):
-            # url = 'products'
-                url = 'products?page='+str(i)
-                if limit:
-                    url += '&per_page=%s'%(limit)
-                i += 1
-                product_data = woocommerce.get(url).json()
-                if 'errors' in product_data:
-                    raise UserError(_("Error : "+str(product_data['errors'][0]['message'])))
-                else :
-                    if product_data:
-                        i = i+1
-                        for product in product_data:
-                            variants = []
-                            if not self.env['channel.template.mappings'].search([('store_product_id','=',product['id']),('channel_id.id','=',self.id)]):
-                                categ = ""
-                                if product['type'] == 'variable':
-                                    variants = self.create_woocommerce_variants(woocommerce,product['id'], product['variations'])
-                                count = count + 1
-                                for category in product['categories']:
-                                    category_id = self.env['category.feed'].search([('name','=',category),('channel_id.id','=',self.id)])
-                                    if category_id:
-                                        categ = categ+str(category_id.store_id)+","
-                                try:
-                                    product['price']=float(product['price'])
-                                except:
-                                    pass
-                                product_feed_dict = {'name'				: product['name'],
-                                                'store_id'				: product['id'],
-                                                'default_code' 			: product['sku'],
-                                                'list_price'			: product['price'],
-                                                'channel_id'			: self.id,
-                                                'description_sale'		: remove_tag.sub('',product['description']),
-                                                'qty_available' 		: product['stock_quantity'],
-                                                'feed_variants' 		: variants,
-                                                'image_url'				: product['images'][0]['src'],
-                                                'extra_categ_ids'		: categ,
-                                                # 'ecom_store'			: 'woocommerce',
-                                                }
-                                if not product['type'] == 'variable':
-                                    product_feed_dict.update({
-                                                'weight'				: product['weight'] or "",
-                                                # 'weight_unit'			: 'kg',
-                                                'length'				: product['dimensions']['length'] or "",
-                                                'width'					: product['dimensions']['width'] or "",
-                                                'height'				: product['dimensions']['height'] or "",
-                                                # 'dimension_unit'		: product['dimensions']['unit'] or "",
-                                    })
-                                if product['downloadable'] == True or product['virtual'] == True:
-                                    product_feed_dict.update({'type':'service'})
-                                product_rec = product_tmpl.create(product_feed_dict)
-                                list_product.append(product_rec)
-                        if limit:
-                            feed_res = dict(create_ids=list_product,update_ids=[])
-                            self.env['channel.operation'].post_feed_import_process(self,feed_res)
-                        pagination_info["import_product_last_page"] = i
-                        self.write({
-                            "pagination_info":pagination_info
-                        })
-                        self._cr.commit()
+            # while(i):
+            url = 'products'
+            # url = 'products?page='+str(i)
+            # if limit:
+            #     url += '&per_page=%s'%(limit)
+            # i += 1
+            product_data = woocommerce.get(url).json()
+            if 'errors' in product_data:
+                raise UserError(_("Error : "+str(product_data['errors'][0]['message'])))
+            else :
+                if product_data:
+                    i = i+1
+                    for product in product_data:
+                        variants = []
+                        if not self.env['channel.template.mappings'].search([('store_product_id','=',product['id']),('channel_id.id','=',self.id)]):
+                            categ = ""
+                            if product['type'] == 'variable':
+                                variants = self.create_woocommerce_variants(woocommerce,product['id'], product['variations'])
+                            count = count + 1
+                            for category in product['categories']:
+                                category_id = self.env['category.feed'].search([('name','=',category),('channel_id.id','=',self.id)])
+                                if category_id:
+                                    categ = categ+str(category_id.store_id)+","
+                            try:
+                                product['price']=float(product['price'])
+                            except:
+                                pass
+                            product_feed_dict = {'name'				: product['name'],
+                                            'store_id'				: product['id'],
+                                            'default_code' 			: product['sku'],
+                                            'list_price'			: product['price'],
+                                            'channel_id'			: self.id,
+                                            'description_sale'		: remove_tag.sub('',product['description']),
+                                            'qty_available' 		: product['stock_quantity'],
+                                            'feed_variants' 		: variants,
+                                            'image_url'				: product['images'][0]['src'],
+                                            'extra_categ_ids'		: categ,
+                                            # 'ecom_store'			: 'woocommerce',
+                                            }
+                            if not product['type'] == 'variable':
+                                product_feed_dict.update({
+                                            'weight'				: product['weight'] or "",
+                                            # 'weight_unit'			: 'kg',
+                                            'length'				: product['dimensions']['length'] or "",
+                                            'width'					: product['dimensions']['width'] or "",
+                                            'height'				: product['dimensions']['height'] or "",
+                                            # 'dimension_unit'		: product['dimensions']['unit'] or "",
+                                })
+                            if product['downloadable'] == True or product['virtual'] == True:
+                                product_feed_dict.update({'type':'service'})
+                            product_rec = product_tmpl.create(product_feed_dict)
+                            list_product.append(product_rec)
+                    if limit:
+                        feed_res = dict(create_ids=list_product,update_ids=[])
+                        self.env['channel.operation'].post_feed_import_process(self,feed_res)
+                    pagination_info["import_product_last_page"] = i
+                    self.write({
+                        "pagination_info":pagination_info
+                    })
+                    self._cr.commit()
 
-                    else:
-                        i=0
-                        pagination_info["import_product_last_page"] = 1
-                        self.write({
-                            "pagination_info":pagination_info
-                        })
-                        self._cr.commit()
+                else:
+                    i=0
+                    pagination_info["import_product_last_page"] = 1
+                    self.write({
+                        "pagination_info":pagination_info
+                    })
+                    self._cr.commit()
             # feed_res = dict(create_ids=list_product,update_ids=[])
             # self.env['channel.operation'].post_feed_import_process(self,feed_res)
             # self.import_product_date = str(datetime.now().date())

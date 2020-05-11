@@ -74,7 +74,7 @@ class MultiChannelSale(models.Model):
 
 	@api.multi
 	def create_woocommerce_product_image(self, template, variant = False):
-		if template.image:
+		if template.image_medium:
 			image_list = []
 			count = 0
 			template_url,name = self.set_woocommerce_image_path(template.name, template.product_variant_ids[0])
@@ -178,7 +178,7 @@ class MultiChannelSale(models.Model):
 					if variant.weight:
 						variant_data['weight']= str(variant.weight)  or  ""
 					if image_ids:
-						variant_data.update({'image': {'id':image_ids[count]}})
+						variant_data.update({'image_medium': {'id':image_ids[count]}})
 					if woocommerce:
 						return_dict = woocommerce.post("products/"+str(woo_product_id)+"/variations",variant_data).json()
 						count += 1
@@ -275,7 +275,7 @@ class MultiChannelSale(models.Model):
 						'stock_quantity'	: quantity,
 						'in_stock'			: True,
 			}
-			if template.image:
+			if template.image_medium:
 				product_dict['images'] = self.create_woocommerce_product_image(template)
 			if template.length or template.width or template.height:
 				dimensions = {
