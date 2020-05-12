@@ -23,8 +23,8 @@ class MultiChannelSale(models.Model):
 		update_rec = []
 		categ = ''
 		count = 0
-		# self.import_woocommerce_attribute()
-		# self.import_woocommerce_categories()
+		self.import_woocommerce_attribute()
+		self.import_woocommerce_categories()
 		if not woocommerce:
 			woocommerce = self.get_woocommerce_connection()
 		product_tmpl = self.env['product.feed']
@@ -75,16 +75,16 @@ class MultiChannelSale(models.Model):
 											'list_price'			: product['price'],
 											'channel_id'			: self.id,
 											'description_sale'		: remove_tag.sub('',product['description']),
-											#'qty_available'		: product['stock_quantity'],
+											'qty_available'		: product['stock_quantity'],
 											'feed_variants' 		: variants,
 											'image_url'				: product['images'][0]['src'],
 											'extra_categ_ids'		: categ,
-											'weight'				: product['weight'] or "",
+											'weight'				: product['weight'],
 											# 'weight_unit'			: 'kg',
-											'length'				: product['dimensions']['length'] or "",
-											'width'					: product['dimensions']['width'] or "",
-											'height'				: product['dimensions']['height'] or "",
-											# 'dimension_unit'		: product['dimensions']['unit'] or "",
+											'length'				: product['dimensions']['length'],
+											'width'					: product['dimensions']['width'],
+											'height'				: product['dimensions']['height'] ,
+											# 'dimension_unit'		: product['dimensions']['unit'] ,
 											}
 						update_record.write(product_feed_dict)
 						self._cr.commit()
@@ -107,19 +107,20 @@ class MultiChannelSale(models.Model):
 										'store_id'				: product['id'],
 										'default_code'  		: product['sku'],
 										'list_price'			: product['price'],
+										# 'list_price'			: float(product['regular_price']),
 										'channel_id'			: self.id,
 										'description_sale'		: remove_tag.sub('',product['description']),
-										#'qty_available'		: product['stock_quantity'],
+										'qty_available'		: product['stock_quantity'],
 										'feed_variants' 		: variants,
 										'image_url'				: product['images'][0]['src'],
 										'extra_categ_ids'		: categ,
 										'ecom_store'			: 'woocommerce',
-										'weight'				: product['weight'] or "",
+										'weight'				: product['weight'],
 										# 'weight_unit'			: 'kg',
-										'length'				: product['dimensions']['length'] or "",
-										'width'					: product['dimensions']['width'] or "",
-										'height'				: product['dimensions']['height'] or "",
-										# 'dimension_unit'		: product['dimensions']['unit'] or "",
+										'length'				: product['dimensions']['length'],
+										'width'					: product['dimensions']['width'],
+										'height'				: product['dimensions']['height'],
+										# 'dimension_unit'		: product['dimensions']['unit'],
 										}
 						product_rec = product_tmpl.create(product_feed_dict)
 						product_rec.state = 'update'

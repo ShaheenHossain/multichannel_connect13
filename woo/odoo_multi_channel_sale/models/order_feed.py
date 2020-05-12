@@ -431,18 +431,28 @@ class OrderFeed(models.Model):
         message = ''
         status=True
         lines = []
-        line_ids = vals.pop('line_ids')
-        line_name = vals.pop('line_name')
-        line_price_unit = vals.pop('line_price_unit')
+        line_ids = vals.get('line_ids')
+        # line_ids = vals.pop('line_ids')
+        # line_name = vals.pop('line_name')
+        line_name = vals.get('line_name')
+        # line_price_unit = vals.pop('line_price_unit')
+        line_price_unit = vals.get('line_price_unit')
         if line_price_unit:line_price_unit = parse_float(line_price_unit)
-        line_product_id = vals.pop('line_product_id')
-        line_variant_ids = vals.pop('line_variant_ids')
-        line_product_uom_qty = vals.pop('line_product_uom_qty')
-        line_product_default_code = vals.pop('line_product_default_code')
-        line_source = vals.pop('line_source')
-        line_product_barcode = vals.pop('line_product_barcode')
-        line_taxes = vals.pop('line_taxes')
-        # vals['company_id'] = channel_id.channel_company_id.id
+        # line_product_id = vals.pop('line_product_id')
+        line_product_id = vals.get('line_product_id')
+        # line_variant_ids = vals.pop('line_variant_ids')
+        line_variant_ids = vals.get('line_variant_ids')
+        # line_product_uom_qty = vals.pop('line_product_uom_qty')
+        line_product_uom_qty = vals.get('line_product_uom_qty')
+        # line_product_default_code = vals.pop('line_product_default_code')
+        line_product_default_code = vals.get('line_product_default_code')
+        # line_source = vals.pop('line_source')
+        line_source = vals.get('line_source')
+        # line_product_barcode = vals.pop('line_product_barcode')
+        line_product_barcode = vals.get('line_product_barcode')
+        # line_taxes = vals.pop('line_taxes')
+        line_taxes = vals.get('line_taxes')
+        vals['company_id'] = channel_id.channel_company_id.id
         if line_ids:
             for line_id in self.env['order.line.feed'].browse(line_ids):
                 line_price_unit = line_id.line_price_unit
@@ -607,13 +617,16 @@ class OrderFeed(models.Model):
         create_id=None
         self.ensure_one()
         vals = EL(self.read(self.get_order_fields()))
-        store_id = vals.pop('store_id')
+        # store_id = vals.pop('store_id')
+        store_id = vals.get('store_id')
 
-        store_source = vals.pop('store_source')
+        # store_source = vals.pop('store_source')
+        store_source = vals.get('store_source')
         match = channel_id.match_order_mappings(store_id)
         _logger.info("============================== Order Are Mapped ==========================================")
         state = 'done'
-        store_partner_id = vals.pop('partner_id')
+        # store_partner_id = vals.pop('partner_id')
+        store_partner_id = vals.get('partner_id')
 
 
         date_info = self.get_order_date_info(channel_id,vals)
@@ -645,7 +658,8 @@ class OrderFeed(models.Model):
 
 
         if state=='done':
-            carrier_id = vals.pop('carrier_id','')
+            # carrier_id = vals.pop('carrier_id','')
+            carrier_id = vals.get('carrier_id','')
 
             if carrier_id:
                 carrier_res = self.get_carrier_id(carrier_id,channel_id=channel_id)
@@ -675,10 +689,14 @@ class OrderFeed(models.Model):
                 pricelist_id = channel_id.match_create_pricelist_id(currency_id)
                 vals['pricelist_id']=pricelist_id.id
 
-        vals.pop('name')
-        vals.pop('id')
-        vals.pop('website_message_ids','')
-        vals.pop('message_follower_ids','')
+        # vals.pop('name')
+        vals.get('name')
+        # vals.pop('id')
+        vals.get('id')
+        # vals.pop('website_message_ids','')
+        vals.get('website_message_ids','')
+        # vals.pop('message_follower_ids','')
+        vals.get('message_follower_ids','')
         vals['team_id'] = channel_id.crm_team_id.id
         vals['warehouse_id'] = channel_id.warehouse_id.id
         vals['company_id'] = channel_id.channel_company_id.id
@@ -708,7 +726,8 @@ class OrderFeed(models.Model):
         else:
             if state == 'done':
                 try:
-                    order_state = vals.pop('order_state')
+                    # order_state = vals.pop('order_state')
+                    order_state = vals.get('order_state')
 
                     erp_id = self.env['sale.order'].sudo().create(vals)
                     _logger.info(

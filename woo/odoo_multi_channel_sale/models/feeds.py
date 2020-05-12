@@ -916,7 +916,8 @@ class ProductFeed(models.Model):
             'lang': channel_id.language_id.code,
         })
         vals = EL(self.read(self.get_product_fields()))
-        store_id = vals.pop('store_id')
+        # store_id = vals.pop('store_id')
+        store_id = vals.get('store_id')
 
         state = 'done'
         if not vals.get('name'):
@@ -928,31 +929,40 @@ class ProductFeed(models.Model):
         categ_id = channel_id.default_category_id.id
         if categ_id:
             vals['categ_id'] = categ_id
-        weight_unit = vals.pop('weight_unit')
+        # weight_unit = vals.pop('weight_unit')
+        weight_unit = vals.get('weight_unit')
         if weight_unit:
+            # uom_id = self.env['product.uom'].search([('name','=',weight_unit)])
             uom_id = channel_id.get_uom_id(name=weight_unit).id
             if uom_id:
                 vals['uom_id'] = uom_id
                 vals['uom_po_id'] = uom_id
 
-        dimensions_unit = vals.pop('dimensions_unit')
+        # dimensions_unit = vals.pop('dimensions_unit')
+        dimensions_unit = vals.get('dimensions_unit')
         if dimensions_unit:
             vals['dimensions_uom_id'] = channel_id.get_uom_id(
                 name=dimensions_unit).id
-        if not vals.pop('wk_product_id_type'):
+        # if not vals.pop('wk_product_id_type'):
+        if not vals.get('wk_product_id_type'):
             vals['wk_product_id_type'] = 'wk_upc'
-        variant_lines = vals.pop('feed_variants')
+        # variant_lines = vals.pop('feed_variants')
+        variant_lines = vals.get('feed_variants')
         feed_variants = self.feed_variants
         if variant_lines:
             check_attr = self.check_attribute_value(feed_variants)
             state = check_attr.get('state')
             message += check_attr.get('message')
-        qty_available = vals.pop('qty_available')
+        # qty_available = vals.pop('qty_available')
+        qty_available = vals.get('qty_available')
         list_price = vals.get('list_price', '')
+        # if not self.channel_id.override_price:
+        #     list_price = vals.pop('list_price')
         if not self.channel_id.override_price:
-            list_price = vals.pop('list_price')
+            list_price = vals.get('list_price')
         list_price = list_price and parse_float(list_price) or 0
-        image_url = vals.pop('image_url')
+        # image_url = vals.pop('image_url')
+        image_url = vals.get('image_url')
         location_id = channel_id.location_id
         if not vals.get('image') and image_url and (image_url not in ['false', 'False', False]):
             image_res = channel_id.read_website_image_url(image_url)
@@ -965,7 +975,8 @@ class ProductFeed(models.Model):
 
         if state == 'done':
             if match:
-                extra_categ_ids = vals.pop('extra_categ_ids')
+                # extra_categ_ids = vals.pop('extra_categ_ids')
+                extra_categ_ids = vals.get('extra_categ_ids')
                 if not template_exists_odoo:
                     template_id = match.template_name
                     template_id.with_context(context).write(vals)
@@ -1004,9 +1015,9 @@ class ProductFeed(models.Model):
                             price=list_price,
                             channel_id=channel_id
                         )
-                        # if qty_available and eval(qty_available) > 0:
-                        #     self.wk_change_product_qty(
-                        #         variant_id, qty_available, location_id)
+                        if qty_available and eval(qty_available) > 0:
+                            self.wk_change_product_qty(
+                                variant_id, qty_available, location_id)
                         match_product = channel_id.match_product_mappings(
                             store_id, 'No Variants', default_code=variant_vals.get('default_code'),
                             barcode=variant_vals.get('barcode'))
@@ -1045,7 +1056,7 @@ class ProductFeed(models.Model):
                         else:
                             template_id = self.env['product.template'].with_context(context).create(vals)
                     else:
-                        # template_exists_odoo.with_context(context).write(vals)
+                        template_exists_odoo.with_context(context).write(vals)
                         template_id = template_exists_odoo
                         extra_categ_ids = vals.pop('extra_categ_ids')
                         if extra_categ_ids:

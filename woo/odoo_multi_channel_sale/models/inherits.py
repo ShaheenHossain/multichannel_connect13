@@ -29,8 +29,8 @@ class ProductTemplate(models.Model):
         string='Height',
     )
     dimensions_uom_id = fields.Many2one(
-        'uom.uom',
-        'Unit of Measure',
+        comodel_name='product.uom',
+        string='Unit of Measure',
         help="Default Unit of Measure used for dimension."
     )
 

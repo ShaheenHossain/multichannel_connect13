@@ -533,7 +533,7 @@ class MultiChannelSale(models.Model):
         domain = [
             ('name', '=', name),
         ]
-        return self.env['uom.uom'].search(domain)
+        return self.env['product.uom'].search(domain)
 
     @api.model
     def get_store_attribute_id(self, name, create_obj = False):
