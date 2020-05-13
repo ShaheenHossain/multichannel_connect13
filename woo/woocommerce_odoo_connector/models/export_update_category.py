@@ -49,6 +49,8 @@ class MultiChannelSale(models.Model):
 				count += 1
 				if category.parent_id:
 					parent_category = self.env['channel.category.mappings'].search([('odoo_category_id','=',category.parent_id.id),('channel_id.id','=',self.id)])
+					store_category_id = parent_category.store_category_id
+
 					if not parent_category:
 						self.export_woocommerce_categories(0)
 						parent_category = self.env['channel.category.mappings'].search([('odoo_category_id','=',category.parent_id.id),('channel_id.id','=',self.id)])

@@ -348,8 +348,8 @@ class MultiChannelSale(models.Model):
 
 	@api.multi
 	def export_woocommerce_product(self):
-		# self.export_woocommerce_attributes_values()
-		# self.export_woocommerce_categories(0)
+		self.export_woocommerce_attributes_values()
+		self.export_woocommerce_categories(0)
 		# message = self.export_update_woocommerce_product()
 		message =""
 		woocommerce = self.get_woocommerce_connection()

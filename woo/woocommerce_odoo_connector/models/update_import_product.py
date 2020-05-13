@@ -62,9 +62,10 @@ class MultiChannelSale(models.Model):
 							update_record.write({'feed_variants':[(5,),]})
 							variants = self.create_woocommerce_variants(woocommerce,product['id'],product['variations'])
 						for category in product['categories']:
-							category_id = self.env['category.feed'].search([('name','=',category),('channel_id.id','=',self.id)])
+							category_id = self.env['category.feed'].search([('name','=',category['name']),('channel_id.id','=',self.id)], limit=1)
 							if category_id:
-								categ = categ+str(category_id.store_id)+","
+								# categ = categ+str(category_id.store_id)+","
+								categ = str(category_id.store_id)
 						try:
 							product['price']=float(product['price'])
 						except:
@@ -96,9 +97,10 @@ class MultiChannelSale(models.Model):
 							variants = self.create_woocommerce_variants(woocommerce,product['id'],product['variations'])
 						count = count + 1
 						for category in product['categories']:
-							category_id = self.env['category.feed'].search([('name','=',category),('channel_id.id','=',self.id)])
+							category_id = self.env['category.feed'].search([('name','=',category['name']),('channel_id.id','=',self.id)])
 							if category_id:
-								categ = categ+str(category_id.store_id)+","
+								# categ = categ+str(category_id.store_id)+","
+								categ = str(category_id.store_id)
 						try:
 							product['price']=float(product['price'])
 						except:

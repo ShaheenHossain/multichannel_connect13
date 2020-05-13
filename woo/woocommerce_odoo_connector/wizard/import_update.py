@@ -28,7 +28,7 @@ class ProductImportUpdate(models.TransientModel):
                         channel.import_product_date = self.date
                         message = channel.import_woocommerce_products()
                 else:
-                    # channel.update_product_date = self.date
+                    channel.update_product_date = self.date
                     message = channel.update_woocommerce_products()
                 return message
             raise Warning("No Channel Id")

@@ -677,26 +677,28 @@ class OrderFeed(models.Model):
                 if len(order_line):
                     vals['order_line'] = order_line
                     state = 'done'
+
         currency=self.currency
-
         if state=='done' and currency:
-            currency_id = channel_id.get_currency_id(currency)
-            if not currency_id:
-                message += '<br/> Currency %s no active in Odoo'%(currency)
-                state = 'error'
-                _logger.error('#OrderError4 %r'%message)
-            else:
-                pricelist_id = channel_id.match_create_pricelist_id(currency_id)
-                vals['pricelist_id']=pricelist_id.id
+            currency_ref=self.env['res.currency'].search([('name','=',currency)])
+            if currency_ref:
+                currency_id = channel_id.get_currency_id(currency)
+                if not currency_id:
+                    message += '<br/> Currency %s no active in Odoo'%(currency)
+                    state = 'error'
+                    _logger.error('#OrderError4 %r'%message)
+                else:
+                    pricelist_id = channel_id.match_create_pricelist_id(currency_id)
+                    vals['pricelist_id']=pricelist_id.id
 
-        # vals.pop('name')
-        vals.get('name')
-        # vals.pop('id')
-        vals.get('id')
-        # vals.pop('website_message_ids','')
-        vals.get('website_message_ids','')
-        # vals.pop('message_follower_ids','')
-        vals.get('message_follower_ids','')
+        vals.pop('name')
+        # vals.get('name')
+        vals.pop('id')
+        # vals.get('id')
+        vals.pop('website_message_ids','')
+        # vals.get('website_message_ids','')
+        vals.pop('message_follower_ids','')
+        # vals.get('message_follower_ids','')
         vals['team_id'] = channel_id.crm_team_id.id
         vals['warehouse_id'] = channel_id.warehouse_id.id
         vals['company_id'] = channel_id.channel_company_id.id
@@ -704,7 +706,7 @@ class OrderFeed(models.Model):
 
 
         if match and match.order_name:
-            if  state =='done' :
+            if state =='done' :
                 try:
 
                     order_state = vals.pop('order_state')

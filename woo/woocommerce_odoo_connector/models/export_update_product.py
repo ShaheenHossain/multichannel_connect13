@@ -138,21 +138,21 @@ class MultiChannelSale(models.Model):
 								'sku' 				: template.default_code or "",
 								'regular_price'		: str(template.with_context(pricelist=self.pricelist_name.id).price) or "",
 								'attributes'		: self.set_woocommerce_attribute_line(template),
-								'categories'		: self.set_woocommerce_product_categories(template),
+								'categories'		: self.set_woocommerce_product_categories(template) or "",
 								'short_description'	: template.description_sale  or "" ,
 								'description'		: template.description or "",
 								'price'				: template.with_context(pricelist=self.pricelist_name.id).price,
 			})
 			if template.length or template.width or template.height:
 				dimensions = {
-								u'width': str(template.width) or "", 
-								u'length': str(template.length) or "" , 
-								u'unit': str(template.dimensions_uom_id.name) or "", 
-								u'height': str(template.height) or "",
+								'width': float(template.width) or "",
+								'length': float(template.length) or "" ,
+								'unit': float(template.dimensions_uom_id.name) or "",
+								'height': float(template.height) or "",
 							}
 				product_dict['dimensions']=dimensions
 			if template.weight:
-				product_dict['weight']= str(template.weight)  or  ""
+				product_dict['weight']= float(template.weight)  or  ""
 			try:
 				return_dict = woocommerce.put('products/'+str(store_id),product_dict).json()
 				if 'message' in return_dict:
@@ -180,10 +180,10 @@ class MultiChannelSale(models.Model):
 			})
 			if template.length or template.width or template.height:
 				dimensions = {
-								u'width': str(template.width) or "", 
-								u'length': str(template.length) or "" , 
-								u'unit': str(template.dimensions_uom_id.name) or "", 
-								u'height': str(template.height) or "",
+								'width': str(template.width) or "",
+								'length': str(template.length) or "" ,
+								'unit': str(template.dimensions_uom_id.name) or "",
+								'height': str(template.height) or "",
 							}
 				product_dict['dimensions']=dimensions
 			if template.weight:
@@ -306,10 +306,10 @@ class MultiChannelSale(models.Model):
 			})
 			if template.length or template.width or template.height:
 				dimensions = {
-								u'width': str(template.width) or "", 
-								u'length': str(template.length) or "" , 
-								u'unit': str(template.dimensions_uom_id.name) or "", 
-								u'height': str(template.height) or "",
+								'width': str(template.width) or "",
+								'length': str(template.length) or "" ,
+								'unit': str(template.dimensions_uom_id.name) or "",
+								'height': str(template.height) or "",
 							}
 				product_dict['dimensions']=dimensions
 			if template.weight:
@@ -358,10 +358,10 @@ class MultiChannelSale(models.Model):
 									}
 						if variant.length or variant.width or variant.height:
 							dimensions = {
-								u'width': str(variant.width) or "", 
-								u'length': str(variant.length) or "" , 
-								u'unit': str(variant.dimensions_uom_id.name) or "", 
-								u'height': str(variant.height) or "",
+								'width': str(variant.width) or "",
+								'length': str(variant.length) or "" ,
+								'unit': str(variant.dimensions_uom_id.name) or "",
+								'height': str(variant.height) or "",
 							}
 							variant_data['dimensions']=dimensions
 						if variant.weight:
