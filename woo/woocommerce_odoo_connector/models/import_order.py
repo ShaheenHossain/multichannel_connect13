@@ -182,7 +182,7 @@ class MultiChannelSale(models.Model):
 											}
 								if order['billing']:
 									order_dict.update({
-													'invoice_partner_id': order['billing']['email'],
+													# 'invoice_partner_id': order['billing']['email'],
 													'invoice_name'	   	: order['billing']['first_name']+" "+order['billing']['last_name'],
 													'invoice_email'    	: order['billing']['email'],
 													'invoice_phone'    	: order['billing']['phone'],
@@ -294,7 +294,7 @@ class MultiChannelSale(models.Model):
 											}
 								if order['billing']:
 									order_dict.update({
-													'invoice_partner_id': order['billing']['email'],
+													# 'invoice_partner_id': order['billing']['email'],
 													'invoice_name'	   	: order['billing']['first_name']+" "+order['billing']['last_name'],
 													'invoice_email'    	: order['billing']['email'],
 													'invoice_phone'    	: order['billing']['phone'],

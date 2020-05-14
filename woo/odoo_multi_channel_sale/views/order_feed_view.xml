@@ -323,7 +323,9 @@
 	                		</group>
 	                		<group string='Billing Address'>
 	                			<group>
-            					<field name="invoice_partner_id" required='1'
+<!--            					<field name="invoice_partner_id" required='1'-->
+<!--                					attrs= "{'readonly':[('state','=', 'done')]}"/>-->
+									<field name="invoice_partner_id"
                 					attrs= "{'readonly':[('state','=', 'done')]}"/>
         					 	<field name="invoice_email" required='1'
             					 	attrs= "{'readonly':[('state','=', 'done')]}"/>
@@ -357,9 +359,12 @@
 	                		<group  string='Shipping Address'
 	                		attrs= "{'invisible':[('same_shipping_billing','=',True)]}" >
                 			<group>
-                				<field name="shipping_partner_id"
-            					 	attrs= "{'readonly':[('state','=', 'done')],
-            					 	'required':[('same_shipping_billing','=',False)]
+<!--                				<field name="shipping_partner_id"-->
+<!--            					 	attrs= "{'readonly':[('state','=', 'done')],-->
+<!--            					 	'required':[('same_shipping_billing','=',False)]-->
+<!--            					 	}"/>-->
+								<field name="shipping_partner_id"
+            					 	attrs= "{'readonly':[('state','=', 'done')]
             					 	}"/>
                 				<field name="shipping_email"
             					 	attrs= "{'readonly':[('state','=', 'done')],
