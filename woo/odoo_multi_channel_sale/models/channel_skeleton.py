@@ -51,10 +51,10 @@ class ChannelMappings(models.Model):
 		)
 		
  	# _sql_constraints = [
-  #       ('channel_store_store_id_uniq',
-  #       	'unique(channel_id, store_id)',
-  #       	'Store Object ID must be unique for channel mapping!'),
-  #   ]
+    #     ('channel_store_store_id_uniq',
+    #     	'unique(channel_id, store_id)',
+    #     	'Store Object ID must be unique for channel mapping!'),
+    # ]
 	def _compute_name(self):
 		pass
 

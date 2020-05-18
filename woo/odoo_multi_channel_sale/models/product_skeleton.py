@@ -21,12 +21,12 @@ class ChannelTemplateMappings(models.Model):
     barcode = fields.Char(
         string="Barcode/EAN/UPC or ISBN")
     _sql_constraints = [
-        # ('channel_store_store_product_id_uniq',
-        #     'unique(channel_id, store_product_id)',
-        #     'Store Product ID must be unique for channel product mapping!'),
-        # ('channel_odoo_odoo_template_id_uniq',
-        #     'unique(channel_id, odoo_template_id)',
-        #     'Odoo Template ID must be unique for channel template mapping!'),
+        ('channel_store_store_product_id_uniq',
+            'unique(channel_id, store_product_id)',
+            'Store Product ID must be unique for channel product mapping!'),
+        ('channel_odoo_odoo_template_id_uniq',
+            'unique(channel_id, odoo_template_id)',
+            'Odoo Template ID must be unique for channel template mapping!'),
     ]
     @api.multi
     def unlink(self):
@@ -76,9 +76,9 @@ class ChannelProductMappings(models.Model):
     barcode = fields.Char(
         string="Barcode/EAN/UPC or ISBN")
     _sql_constraints = [
-        # ('channel_store_store_product_id_store_variant_id_uniq',
-        #     'unique(channel_id, store_product_id,store_variant_id)',
-        #     'Store product+ variants must be unique for channel product mapping!'),
+        ('channel_store_store_product_id_store_variant_id_uniq',
+            'unique(channel_id, store_product_id,store_variant_id)',
+            'Store product+ variants must be unique for channel product mapping!'),
 
     ]
 
