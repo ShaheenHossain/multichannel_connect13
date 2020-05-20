@@ -16,3 +16,4 @@ from . import update_import_orders
 from . import update_import_product
 from . import import_taxes
 from . import woc_config
+from . import export_order

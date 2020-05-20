@@ -61,6 +61,27 @@ class OrderImportUpdate(models.TransientModel):
                 return message
             raise Warning("No Channel Id")
 
+class OrderExportUpdate(models.TransientModel):
+    _name="order.export.update"
+
+    import_update = fields.Selection(selection=[('export', 'Export'), ('update', 'Update')],
+                                     string="Export Operations",
+                                     default="export")
+
+    @api.multi
+    def process(self):
+        message = ''
+        if 'active_id' in self._context:
+            channel = self.env['multi.channel.sale'].browse(self._context['active_id'])
+            if channel:
+                # if self.import_update == 'export':
+                #     count = channel.export_woocommerce_categories(0)
+                #     message += str(count) + " Categories have been exported"
+                #     return channel.display_message(message)
+                # else:
+                message = channel.update_all_orders()
+                return message
+            raise Warning("No Channel Id")
 
 class ProductExportUpdate(models.TransientModel):
     _name = "product.export.update"

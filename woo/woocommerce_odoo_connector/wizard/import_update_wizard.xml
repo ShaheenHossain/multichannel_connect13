@@ -236,6 +236,41 @@
             <field name="target">new</field>
         </record>
 
+<!--    Export Order-->
+    <record id="export_update_order_form_view" model="ir.ui.view">
+            <field name="name">order.export.update.form</field>
+            <field name="model">order.export.update</field>
+            <field name="arch" type="xml">
+                <form>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="import_update" widget='radio'/>
+                        </group>
+                        <group>
+                        <p><i><li> Select export to export orders from odoo to woocommerce</li>
+                            <li> Select update to update orders from odoo to woocommerce</li>
+                            </i></p>
+                    </group>
+                    </group>
+                </sheet>
+                <footer>
+                        <button name="process" class="oe_highlight" type='object' string="submit" />
+                        <button special="cancel" name='cancel' string="Cancel" />
+                </footer>
+                </form>
+            </field>
+        </record>
+
+        <record id="action_export_update_order_form_view" model="ir.actions.act_window">
+            <field name="name">Order Operation</field>
+            <field name="res_model">order.export.update</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="export_update_order_form_view"/>
+            <field name="target">new</field>
+        </record>
+
         <!--Export Products-->
         <record id="export_update_form_view" model="ir.ui.view">
             <field name="name">product.export.update.form</field>

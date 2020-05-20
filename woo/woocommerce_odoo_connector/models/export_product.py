@@ -279,10 +279,10 @@ class MultiChannelSale(models.Model):
 				product_dict['images'] = self.create_woocommerce_product_image(template)
 			if template.length or template.width or template.height:
 				dimensions = {
-								u'width': str(template.width)  or "", 
-								u'length': str(template.length)  or "", 
-								u'unit': str(template.dimensions_uom_id.name)  or "", 
-								u'height': str(template.height)  or "",
+								'width': str(template.width)  or "",
+								'length': str(template.length)  or "",
+								'unit': str(template.dimensions_uom_id.name)  or "",
+								'height': str(template.height)  or "",
 							}
 				product_dict['dimensions']=dimensions
 			if template.weight:

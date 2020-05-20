@@ -178,11 +178,11 @@ class MultiChannelSale(models.Model):
 											'customer_name'  : customer['first_name'] +" "+customer['last_name'],
 											'customer_email' : customer['email'],
 											'order_state'	 : order['status'],
-											'user_id'	     : res_user.id or False,
+											# 'user_id'	     : res_user.id or False,
 											}
 								if order['billing']:
 									order_dict.update({
-													# 'invoice_partner_id': order['billing']['email'],
+													'invoice_partner_id': order['billing']['email'],
 													'invoice_name'	   	: order['billing']['first_name']+" "+order['billing']['last_name'],
 													'invoice_email'    	: order['billing']['email'],
 													'invoice_phone'    	: order['billing']['phone'],
@@ -226,8 +226,8 @@ class MultiChannelSale(models.Model):
 
 	@api.multi
 	def import_all_woocommerce_orders(self):
-		# self.import_woocommerce_attribute()
-		# self.import_woocommerce_categories()
+		self.import_woocommerce_attribute()
+		self.import_woocommerce_categories()
 		woocommerce = self.get_woocommerce_connection()
 		message = ''
 		# self.woc_check_and_create_tax(woocommerce)
@@ -266,8 +266,8 @@ class MultiChannelSale(models.Model):
 										order_lines = self.get_woocommerce_order_line(data)
 										if order['shipping_lines']:
 											order_lines += self.create_or_get_woocommerce_shipping(order_data['shipping_lines'])
-										# if order['coupon_lines']:
-										# 	order_lines += self.create_or_get_woocommerce_voucher(order['coupon_lines'])
+										if order['coupon_lines']:
+											order_lines += self.create_or_get_woocommerce_voucher(order['coupon_lines'])
 
 								customer ={}
 								if order['customer_id']:
@@ -286,15 +286,15 @@ class MultiChannelSale(models.Model):
 											'line_type'		 : 'multi',
 											'carrier_id'	 : method_title,
 											'line_ids'		 : order_lines,
-											'currency'		 : 'EUR',
-											# 'currency'		 : order['currency'],
+											# 'currency'		 : 'EUR',
+											'currency'		 : order['currency'],
 											'customer_name'  : customer['first_name'] +" "+customer['last_name'],
 											'customer_email' : customer['email'],
 											'order_state'	 : order['status'],
 											}
 								if order['billing']:
 									order_dict.update({
-													# 'invoice_partner_id': order['billing']['email'],
+													'invoice_partner_id': order['billing']['email'],
 													'invoice_name'	   	: order['billing']['first_name']+" "+order['billing']['last_name'],
 													'invoice_email'    	: order['billing']['email'],
 													'invoice_phone'    	: order['billing']['phone'],

@@ -29,10 +29,8 @@ class MultiChannelSale(models.Model):
 					attribute_value_dict = {
 											"name": attribute_value.name,
 					}
-					return_value_dict = woocommerce.post(
-															'products/attributes/'+str(attribute_id)+"/terms",
-															attribute_value_dict
-														).json()
+					return_value_dict = woocommerce.post('products/attributes/'+str(attribute_id)+"/terms",
+															attribute_value_dict).json()
 					# if 'message' in return_value_dict:
 					# 	raise UserError(_('Error in Creating terms '+str(return_value_dict['message'])))
 					attr_val += 1
