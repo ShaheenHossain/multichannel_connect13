@@ -64,9 +64,9 @@ class OrderImportUpdate(models.TransientModel):
 class OrderExportUpdate(models.TransientModel):
     _name="order.export.update"
 
-    import_update = fields.Selection(selection=[('export', 'Export'), ('update', 'Update')],
-                                     string="Export Operations",
-                                     default="export")
+    # import_update = fields.Selection(selection=[('export', 'Export'), ('update', 'Update')],
+    #                                  string="Export Operations",
+    #                                  default="export")
 
     @api.multi
     def process(self):

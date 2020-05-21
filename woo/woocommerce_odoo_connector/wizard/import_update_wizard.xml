@@ -242,18 +242,22 @@
             <field name="model">order.export.update</field>
             <field name="arch" type="xml">
                 <form>
-                <sheet>
+<!--                <sheet>-->
+<!--                    <group>-->
+<!--                        <group>-->
+<!--                            <field name="import_update" widget='radio'/>-->
+<!--                        </group>-->
+<!--                        <group>-->
+<!--                        <p><i><li> Select export to export orders from odoo to woocommerce</li>-->
+<!--                            <li> Select update to update orders from odoo to woocommerce</li>-->
+<!--                            </i></p>-->
+<!--                    </group>-->
+<!--                    </group>-->
+<!--                </sheet>-->
                     <group>
-                        <group>
-                            <field name="import_update" widget='radio'/>
-                        </group>
-                        <group>
-                        <p><i><li> Select export to export orders from odoo to woocommerce</li>
-                            <li> Select update to update orders from odoo to woocommerce</li>
+                        <p><i><li> It will Update Orders status from Odoo to WooCommerce</li>
                             </i></p>
                     </group>
-                    </group>
-                </sheet>
                 <footer>
                         <button name="process" class="oe_highlight" type='object' string="submit" />
                         <button special="cancel" name='cancel' string="Cancel" />

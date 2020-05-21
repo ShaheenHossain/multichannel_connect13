@@ -117,8 +117,8 @@
 									icon="fa-5x fa-shopping-cart"
 									aria-label="Export Orders"
 									title="Export Orders"
-									help="It will Export Orders from Odoo to WooCommerce">
-								<span>  Export/Update Orders </span> <span> <i class='fa fa-fw fa-cloud-upload'/></span>
+									help="It will Update Orders status from Odoo to WooCommerce">
+								<span>    Update Orders   </span> <span> <i class='fa fa-fw fa-cloud-upload'/></span>
 							</button>
 						</div>
 

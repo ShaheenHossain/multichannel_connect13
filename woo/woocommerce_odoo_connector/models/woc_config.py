@@ -356,3 +356,26 @@ class StockMove(models.Model):
 					else:
 						channel_rec.update_woocommerce_quantity(woocommerce,-(pick_details['product_qty']), product_record)
 		return super(StockMove, self).multichannel_sync_quantity(pick_details)
+
+class SaleOrder(models.Model):
+	_inherit = 'sale.order'
+
+	@api.multi
+	def write(self,vals):
+		status = super(SaleOrder, self).write(vals)
+		for order in self:
+			if order.channel_mapping_ids:
+				for channel in order.channel_mapping_ids:
+					channel.need_sync = 'yes'
+		return status
+
+	@api.multi
+	def action_cancel(self):
+		status=super(SaleOrder, self).action_cancel()
+		for order in self:
+			if order.channel_mapping_ids:
+				for channel in order.channel_mapping_ids:
+					channel.need_sync = 'yes'
+		return status
+
+

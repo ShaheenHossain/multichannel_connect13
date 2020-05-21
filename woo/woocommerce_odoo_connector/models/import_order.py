@@ -230,7 +230,7 @@ class MultiChannelSale(models.Model):
 		self.import_woocommerce_categories()
 		woocommerce = self.get_woocommerce_connection()
 		message = ''
-		# self.woc_check_and_create_tax(woocommerce)
+		self.woc_check_and_create_tax(woocommerce)
 		list_order = []
 		count = 0
 		context = dict(self._context)
