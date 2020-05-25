@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+
+
+
+
+        <record id="view_order_form_inherit" model="ir.ui.view">
+        <field name="name">woocommerce.odoo.sale.order</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="groups_id" eval="[(4, ref('odoo_multi_channel_sale.group_multi_channel_user'))]"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header" position="inside">
+                <button
+                        name="woocommerce_odoo_connector.action_export_update_order_form_view"
+                        string="Update Order to Woocommerce" type="action">
+                </button>
+            </xpath>
+        </field>
+        </record>
+    </data>
+</openerp>

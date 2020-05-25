@@ -64,24 +64,32 @@ class OrderImportUpdate(models.TransientModel):
 class OrderExportUpdate(models.TransientModel):
     _name="order.export.update"
 
-    # import_update = fields.Selection(selection=[('export', 'Export'), ('update', 'Update')],
-    #                                  string="Export Operations",
-    #                                  default="export")
+    import_update = fields.Selection(selection=[('cancel_order', 'Cancel Order'), ('refund_order', 'Refund Order')],
+                                     string="Export Operations",
+                                     default="export")
+    channel_id=fields.Many2one('multi.channel.sale',string="Channel")
 
     @api.multi
     def process(self):
         message = ''
-        if 'active_id' in self._context:
-            channel = self.env['multi.channel.sale'].browse(self._context['active_id'])
-            if channel:
-                # if self.import_update == 'export':
-                #     count = channel.export_woocommerce_categories(0)
-                #     message += str(count) + " Categories have been exported"
-                #     return channel.display_message(message)
-                # else:
-                message = channel.update_all_orders()
-                return message
-            raise Warning("No Channel Id")
+        active_model = self._context.get('active_model')
+        if active_model=='sale.order':
+            if self.import_update == 'cancel_order':
+                message = self.channel_id.cancel_orders()
+            else:
+                message = self.channel_id.refund_orders()
+            return message
+        else:
+            if 'active_id' in self._context:
+                channel = self.env['multi.channel.sale'].browse(self._context['active_id'])
+                if channel:
+                    if self.import_update=='cancel_order':
+                        message = channel.cancel_orders()
+                    else:
+                        message = channel.refund_orders()
+
+                    return message
+                raise Warning("No Channel Id")
 
 class ProductExportUpdate(models.TransientModel):
     _name = "product.export.update"
@@ -100,6 +108,7 @@ class ProductExportUpdate(models.TransientModel):
                 else:
                     message = channel.export_update_woocommerce_product()
                 return message
+
             raise Warning("No Channel Id")
 
 

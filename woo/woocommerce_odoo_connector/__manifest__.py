@@ -16,6 +16,7 @@
                              'views/woc_config_views.xml',
                              'data/import_cron.xml',
                              'views/inherited_woocommerce_dashboard_view.xml',
+                             'views/sale_order.xml',
                              'wizard/import_update_wizard.xml',
                              'data/default_data.xml',
                              'security/ir.model.access.csv',
