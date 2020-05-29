@@ -8,7 +8,7 @@ _logger = logging.getLogger(__name__)
 class ProductImportUpdate(models.TransientModel):
     _name = "product.import.update"
 
-    import_update = fields.Selection(selection=[('import', 'Import'), ('update', 'Update')],
+    import_update = fields.Selection(selection=[('import', 'Import'), ('update', 'Update'),('import_stock', 'Import Stocks')],
                                      string="Import Operations",
                                      default="import")
     date = fields.Datetime("Date", default=lambda self: fields.datetime.now())
@@ -27,11 +27,14 @@ class ProductImportUpdate(models.TransientModel):
                     else:
                         channel.import_product_date = self.date
                         message = channel.import_woocommerce_products()
-                else:
+                elif self.import_update == 'update':
                     channel.update_product_date = self.date
                     message = channel.update_woocommerce_products()
+                else:
+                    message = channel.import_stocks()
                 return message
             raise Warning("No Channel Id")
+
 
 
 class OrderImportUpdate(models.TransientModel):
@@ -64,7 +67,7 @@ class OrderImportUpdate(models.TransientModel):
 class OrderExportUpdate(models.TransientModel):
     _name="order.export.update"
 
-    import_update = fields.Selection(selection=[('cancel_order', 'Cancel Order'), ('refund_order', 'Refund Order')],
+    import_update = fields.Selection(selection=[('cancel_order', 'Cancel Order'), ('refund_order', 'Refund Order'),('update_status', 'Update Status')],
                                      string="Export Operations",
                                      default="export")
     channel_id=fields.Many2one('multi.channel.sale',string="Channel")
@@ -76,8 +79,10 @@ class OrderExportUpdate(models.TransientModel):
         if active_model=='sale.order':
             if self.import_update == 'cancel_order':
                 message = self.channel_id.cancel_orders()
-            else:
+            if self.import_update == 'refund_order':
                 message = self.channel_id.refund_orders()
+            else:
+                message = self.channel_id.update_orders_status()
             return message
         else:
             if 'active_id' in self._context:
@@ -85,8 +90,11 @@ class OrderExportUpdate(models.TransientModel):
                 if channel:
                     if self.import_update=='cancel_order':
                         message = channel.cancel_orders()
-                    else:
+                    if self.import_update == 'refund_order':
                         message = channel.refund_orders()
+                    else:
+                        message = channel.update_orders_status()
+
 
                     return message
                 raise Warning("No Channel Id")
@@ -94,7 +102,7 @@ class OrderExportUpdate(models.TransientModel):
 class ProductExportUpdate(models.TransientModel):
     _name = "product.export.update"
 
-    import_update = fields.Selection(selection=[('export', 'Export'), ('update', 'Update')],
+    import_update = fields.Selection(selection=[('export', 'Export'), ('update', 'Update'),('export_stock', 'Export Stocks')],
                                      string="Export Operations",
                                      default="export")
 
@@ -105,8 +113,10 @@ class ProductExportUpdate(models.TransientModel):
             if channel:
                 if self.import_update == 'export':
                     message = channel.export_woocommerce_product()
-                else:
+                elif self.import_update == 'update':
                     message = channel.export_update_woocommerce_product()
+                else:
+                    message = channel.export_stocks()
                 return message
 
             raise Warning("No Channel Id")

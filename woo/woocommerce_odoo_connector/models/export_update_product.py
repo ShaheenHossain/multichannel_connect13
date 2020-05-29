@@ -394,3 +394,63 @@ class MultiChannelSale(models.Model):
 				return count
 			else:
 				raise UserError(_('Error in creating variant'))
+
+	def export_stock(self,product,product_mapping):
+		woocommerce = self.get_woocommerce_connection()
+		count=0
+		try:
+			store_id = product_mapping.store_product_id
+			qty_available = int(product.qty_available)
+			if qty_available <= 0:
+				manage_stock = 'False'
+				in_stock = 'False'
+			else:
+				manage_stock = 'True'
+				in_stock = 'True'
+			product_feed = self.env['product.feed'].search([('store_id', '=', store_id)])
+			product_dict={
+				'manage_stock': manage_stock,
+				'in_stock': in_stock,
+				'stock_quantity':qty_available
+			}
+			return_dict=woocommerce.put('products/'+str(store_id),product_dict).json()
+			if 'message' in return_dict:
+				raise UserError(_("Can't update product , " + str(return_dict['message'])))
+			else:
+				feed_dict={
+					'qty_available':return_dict['stock_quantity']
+				}
+				product_feed.update(feed_dict)
+				count+=1
+		except Exception as e:
+			raise UserError(_("Error : " + str(e)))
+		return count
+
+	@api.multi
+	def export_stocks(self):
+		products = self.env['product.template'].search([])
+		active_model = self._context.get('active_model')
+		count = 0
+
+		if active_model == 'product.template':
+			active_id = self._context.get('active_id')
+			product = self.env['product.template'].search([('id', '=', active_id)])
+			product_mapping = self.env['channel.template.mappings'].search(
+				[('template_name', '=', product.id), ('channel_id.id', '=', self.id)])
+			if product_mapping:
+				count = self.export_stock(product, product_mapping)
+			if count == 1:
+				message = " Stock Exported Successfully!"
+			else:
+				message = " Stock Export Failed!"
+
+			return self.display_message(message)
+		else:
+			for product in products:
+				product_mapping = self.env['channel.template.mappings'].search(
+					[('template_name', '=', product.id), ('channel_id.id', '=', self.id)])
+				if product_mapping:
+					count += self.export_stock(product, product_mapping)
+
+			message = str(count) + " Product(s) Stock Exported!"
+			return self.display_message(message)

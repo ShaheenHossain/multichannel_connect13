@@ -12,7 +12,7 @@ ImportOperation = [
 ]
 ExportOperation = [
    ('export','Export'),
-   ('update','Update')
+   ('update','Update'),('export_stock','Export_stock')
 ]
 MappingModelData = dict(
     template = dict(

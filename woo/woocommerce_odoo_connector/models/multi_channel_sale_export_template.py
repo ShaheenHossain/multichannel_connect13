@@ -11,6 +11,9 @@ class ExportTemplates(models.TransientModel):
         message=''
         if self.operation == 'export':
             message = self.channel_id.action_export_woocommerce_products()
-        else:
+        elif self.operation == 'update':
             message = self.channel_id.action_update_woocommerce_products()
+        else:
+            message = self.channel_id.export_stocks()
+
         return message

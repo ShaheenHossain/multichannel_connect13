@@ -18,6 +18,19 @@ except ImportError:
 class MultiChannelSale(models.Model):
 	_inherit = "multi.channel.sale"
 
+	@api.model
+	def wk_change_product_qty(self, product_id, qty_available, location_id):
+		if qty_available and product_id.type == 'product':
+			location_id = location_id and location_id or self.env.ref(
+				'stock.stock_location_stock')
+			inventory_wizard = self.env['stock.change.product.qty'].create({
+				'product_id': product_id.id,
+				'new_quantity': (qty_available),
+				'location_id': location_id.id,
+			})
+			inventory_wizard.change_product_qty()
+
+
 	@api.multi
 	def update_woocommerce_products(self, woocommerce=False):
 		update_rec = []
@@ -132,4 +145,45 @@ class MultiChannelSale(models.Model):
 		self.env['channel.operation'].post_feed_import_process(self,feed_res)
 		self.update_product_date = str(datetime.now())
 		message = str(count)+" Product(s) Updated!  "
+		return self.display_message(message)
+
+	def import_stock(self,product_template,product_mapping):
+		count=0
+		woocommerce = self.get_woocommerce_connection()
+
+		try:
+			store_id = product_mapping.store_product_id
+			product_data = woocommerce.get('products?include='+str(store_id)).json()
+			if 'errors' in product_data:
+				raise UserError(_("Error : " + str(product_data['errors'][0]['message'])))
+			else:
+				if product_data:
+					for product in product_data:
+						product_feed=self.env['product.feed'].search([('store_id','=',store_id)])
+						if product['id'] == int(store_id):
+							count+=1
+							location_id=self.location_id
+							product_id=product_template
+							qty_available=product['stock_quantity']
+							self.wk_change_product_qty(product_id, qty_available, location_id)
+							product_feed_dict={
+								'qty_available':qty_available
+							}
+							product_feed.update(product_feed_dict)
+		except Exception as e:
+			raise UserError(_("Error : " + str(e)))
+		return count
+
+
+	@api.multi
+	def import_stocks(self):
+		product_template=self.env['product.template'].search([])
+		# active_model = self._context.get('active_model')
+		count = 0
+		for product in product_template:
+			product_mappings = self.env['channel.template.mappings'].search(
+				[('template_name', '=', product.id), ('channel_id.id', '=', self.id)])
+			if product_mappings:
+				count+=self.import_stock(product,product_mappings)
+		message = str(count) + " Product(s) Stock Imported!"
 		return self.display_message(message)

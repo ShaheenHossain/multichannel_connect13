@@ -9,13 +9,13 @@
                 <sheet>
                     <group>
                         <group>
-                            <field name="import_update" widget='radio'/>
+                            <field name="import_update" widget='selection'/>
                             <field name="one_time_import"
-                                   attrs="{'invisible': [('import_update','=','update')]}"
+                                   attrs="{'invisible': [('import_update','!=','import')]}"
                             />
                         </group>
                         <group>
-                            <field name="date" attrs="{'invisible': ['|',('one_time_import','=',True),('import_update','=','update')],'required': [('one_time_import','=',False),('import_update','=','import')]}"/>
+                            <field name="date" attrs="{'invisible': ['|',('one_time_import','=',True),('import_update','!=','import')],'required': [('one_time_import','=',False),('import_update','=','import')]}"/>
                             <!--<p cols='2'><h2><b>Note:</b> For Import of large no. of  use One Time Import</h2></p>-->
                         </group>
                         <group>
@@ -23,7 +23,8 @@
                         <group>
                             <p><i><li> Select import to import Products from woocommerce to odoo</li>
                                 <li> Select update to update Products from woocommerce to odoo</li>
-                                <li>To Import large no. of Products use First Time Import</li></i></p>
+                                <li>To Import large no. of Products use First Time Import</li>
+                                <li>To Import Product stocks use Import Stocks</li></i></p>
                         </group>
                     </group>
                 </sheet>
@@ -245,7 +246,7 @@
                 <sheet>
                     <group>
                         <group>
-                            <field name="import_update" widget='radio'/>
+                            <field name="import_update" widget="selection"/>
                             <field name="channel_id" widget="selection" invisible="context.get('active_model')!='sale.order'"/>
 
                         </group>
@@ -285,11 +286,12 @@
                 <sheet>
                     <group>
                         <group>
-                            <field name="import_update" widget='radio'/>
+                            <field name="import_update" widget='selection'/>
                         </group>
                         <group>
                             <p><i><li> Select export to export Products from odoo to woocommerce</li>
                                 <li> Select update to update Products from odoo to woocommerce</li>
+                                <li> Select Export Stocks to Export Products Stock from odoo to woocommerce</li>
                             </i></p>
                         </group>
                     </group>
