@@ -18,6 +18,7 @@ except ImportError:
 class MultiChannelSale(models.Model):
     _inherit = "multi.channel.sale"
 
+
     @api.multi
     def create_woocommerce_variants(self,woocommerce,product_id,variation_ids):
         variant_list = []
@@ -182,6 +183,7 @@ class MultiChannelSale(models.Model):
         if not woocommerce:
             woocommerce = self.get_woocommerce_connection()
         self.import_woocommerce_categories()
+        self.import_all_tags()
         list_product = []
         count = 0
         list_product = []
@@ -211,6 +213,12 @@ class MultiChannelSale(models.Model):
                                     category_id = self.env['channel.category.mappings'].search([('store_category_id','=',category['id']),('channel_id.id','=',self.id)])
                                     if category_id:
                                         categ = categ+str(category_id.store_category_id)+","
+                                for tag in product['tags']:
+                                    tag_ids=[]
+                                    tag_mappings = self.env['channel.tag.mappings'].search(
+                                        [('store_tag_id', '=', tag['id'])])
+                                    tags = tag_mappings.tag_name.id
+                                    tag_ids.append(tags)
                                 try:
                                     product['price']=float(product['price'])
                                 except:
@@ -225,6 +233,7 @@ class MultiChannelSale(models.Model):
                                                 'feed_variants' 		: variants,
                                                 'image_url'				: product['images'][0]['src'],
                                                 'extra_categ_ids'		: categ or '',
+                                                'tag_ids'		        : [(6, 0,tag_ids)],
                                                 #'ecom_store'			: 'woocommerce',
                                                 }
                                 if not product['type'] == 'variable':
@@ -281,77 +290,77 @@ class MultiChannelSale(models.Model):
         product_tmpl = self.env['product.feed']
         try:
             i=pagination_info.get("import_product_last_page",1)
-            # while(i):
-            url = 'products'
-            # url = 'products?page='+str(i)
-            # if limit:
-            #     url += '&per_page=%s'%(limit)
-            # i += 1
-            product_data = woocommerce.get(url).json()
-            if 'errors' in product_data:
-                raise UserError(_("Error : "+str(product_data['errors'][0]['message'])))
-            else :
-                if product_data:
-                    i = i+1
-                    for product in product_data:
-                        variants = []
-                        if not self.env['channel.template.mappings'].search([('store_product_id','=',product['id']),('channel_id.id','=',self.id)]):
-                            categ = ""
-                            if product['type'] == 'variable':
-                                variants = self.create_woocommerce_variants(woocommerce,product['id'], product['variations'])
-                            count = count + 1
-                            for category in product['categories']:
-                                category_id = self.env['category.feed'].search([('name','=',category),('channel_id.id','=',self.id)])
-                                if category_id:
-                                    categ = categ+str(category_id.store_id)+","
-                            try:
-                                product['price']=float(product['price'])
-                            except:
-                                pass
-                            product_feed_dict = {'name'				: product['name'],
-                                            'store_id'				: product['id'],
-                                            'default_code' 			: product['sku'],
-                                            'list_price'			: product['price'],
-                                            'channel_id'			: self.id,
-                                            'description_sale'		: remove_tag.sub('',product['description']),
-                                            'qty_available' 		: product['stock_quantity'],
-                                            'feed_variants' 		: variants,
-                                            'image_url'				: product['images'][0]['src'],
-                                            'extra_categ_ids'		: categ,
-                                            # 'ecom_store'			: 'woocommerce',
-                                            }
-                            if not product['type'] == 'variable':
-                                product_feed_dict.update({
-                                            'weight'				: product['weight'] or "",
-                                            # 'weight_unit'			: 'kg',
-                                            'length'				: product['dimensions']['length'] or "",
-                                            'width'					: product['dimensions']['width'] or "",
-                                            'height'				: product['dimensions']['height'] or "",
-                                            # 'dimension_unit'		: product['dimensions']['unit'] or "",
-                                })
-                            if product['downloadable'] == True or product['virtual'] == True:
-                                product_feed_dict.update({'type':'service'})
-                            product_rec = product_tmpl.create(product_feed_dict)
-                            list_product.append(product_rec)
-                    if limit:
-                        feed_res = dict(create_ids=list_product,update_ids=[])
-                        self.env['channel.operation'].post_feed_import_process(self,feed_res)
-                    pagination_info["import_product_last_page"] = i
-                    self.write({
-                        "pagination_info":pagination_info
-                    })
-                    self._cr.commit()
+            while(i):
+                # url = 'products'
+                url = 'products?page='+str(i)
+                if limit:
+                    url += '&per_page=%s'%(limit)
+                i += 1
+                product_data = woocommerce.get(url).json()
+                if 'errors' in product_data:
+                    raise UserError(_("Error : "+str(product_data['errors'][0]['message'])))
+                else :
+                    if product_data:
+                        i = i+1
+                        for product in product_data:
+                            variants = []
+                            if not self.env['channel.template.mappings'].search([('store_product_id','=',product['id']),('channel_id.id','=',self.id)]):
+                                categ = ""
+                                if product['type'] == 'variable':
+                                    variants = self.create_woocommerce_variants(woocommerce,product['id'], product['variations'])
+                                count = count + 1
+                                for category in product['categories']:
+                                    category_id = self.env['category.feed'].search([('name','=',category),('channel_id.id','=',self.id)])
+                                    if category_id:
+                                        categ = categ+str(category_id.store_id)+","
+                                try:
+                                    product['price']=float(product['price'])
+                                except:
+                                    pass
+                                product_feed_dict = {'name'				: product['name'],
+                                                'store_id'				: product['id'],
+                                                'default_code' 			: product['sku'],
+                                                'list_price'			: product['price'],
+                                                'channel_id'			: self.id,
+                                                'description_sale'		: remove_tag.sub('',product['description']),
+                                                'qty_available' 		: product['stock_quantity'],
+                                                'feed_variants' 		: variants,
+                                                'image_url'				: product['images'][0]['src'],
+                                                'extra_categ_ids'		: categ,
+                                                # 'ecom_store'			: 'woocommerce',
+                                                }
+                                if not product['type'] == 'variable':
+                                    product_feed_dict.update({
+                                                'weight'				: product['weight'] or "",
+                                                # 'weight_unit'			: 'kg',
+                                                'length'				: product['dimensions']['length'] or "",
+                                                'width'					: product['dimensions']['width'] or "",
+                                                'height'				: product['dimensions']['height'] or "",
+                                                # 'dimension_unit'		: product['dimensions']['unit'] or "",
+                                    })
+                                if product['downloadable'] == True or product['virtual'] == True:
+                                    product_feed_dict.update({'type':'service'})
+                                product_rec = product_tmpl.create(product_feed_dict)
+                                list_product.append(product_rec)
+                        if limit:
+                            feed_res = dict(create_ids=list_product,update_ids=[])
+                            self.env['channel.operation'].post_feed_import_process(self,feed_res)
+                        pagination_info["import_product_last_page"] = i
+                        self.write({
+                            "pagination_info":pagination_info
+                        })
+                        self._cr.commit()
 
-                else:
-                    i=0
-                    pagination_info["import_product_last_page"] = 1
-                    self.write({
-                        "pagination_info":pagination_info
-                    })
-                    self._cr.commit()
-            # feed_res = dict(create_ids=list_product,update_ids=[])
-            # self.env['channel.operation'].post_feed_import_process(self,feed_res)
-            # self.import_product_date = str(datetime.now().date())
+                    else:
+                        i=0
+                        pagination_info["import_product_last_page"] = 1
+                        self.write({
+                            "pagination_info":pagination_info
+                        })
+                        self._cr.commit()
+                # feed_res = dict(create_ids=list_product,update_ids=[])
+                # self.env['channel.operation'].post_feed_import_process(self,feed_res)
+                # self.import_product_date = str(datetime.now().date())
             message += str(count)+" Product(s) Imported!"
             return self.display_message(message)
         except Exception as e:

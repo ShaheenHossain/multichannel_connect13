@@ -6,6 +6,7 @@ import logging
 _logger = logging.getLogger(__name__)
 Type = [
     ('product.feed', 'Product'),
+    ('tags.feed', 'Tag'),
     ('category.feed', 'Category'),
     ('order.feed', 'Order'),
     ('partner.feed', 'Partner'),

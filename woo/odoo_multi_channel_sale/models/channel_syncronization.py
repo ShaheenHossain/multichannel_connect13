@@ -7,6 +7,7 @@ ActionOn = (
 	('variant','Variant'),
 	('template','Template'),
 	('product','Product'),
+	('tag','Tag'),
 	('category','Category'),
 	('order','Order'),
 	('customer','Customer'),

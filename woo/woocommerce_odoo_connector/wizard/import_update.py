@@ -8,7 +8,7 @@ _logger = logging.getLogger(__name__)
 class ProductImportUpdate(models.TransientModel):
     _name = "product.import.update"
 
-    import_update = fields.Selection(selection=[('import', 'Import'), ('update', 'Update'),('import_stock', 'Import Stocks')],
+    import_update = fields.Selection(selection=[('import', 'Import'), ('update', 'Update'),('import_stock', 'Import Stocks'),('import_tags', 'Import Tags')],
                                      string="Import Operations",
                                      default="import")
     date = fields.Datetime("Date", default=lambda self: fields.datetime.now())
@@ -30,6 +30,8 @@ class ProductImportUpdate(models.TransientModel):
                 elif self.import_update == 'update':
                     channel.update_product_date = self.date
                     message = channel.update_woocommerce_products()
+                elif self.import_update == 'import_tags':
+                    message = channel.import_all_tags()
                 else:
                     message = channel.import_stocks()
                 return message

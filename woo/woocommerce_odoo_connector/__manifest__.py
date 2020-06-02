@@ -11,7 +11,7 @@
   "license"              :  "Other proprietary",
   "website"              :  "http://www.planet-odoo.com",
   "description"          :  """""",
-  "depends"              :  ['odoo_multi_channel_sale'],
+  "depends"              :  ['odoo_multi_channel_sale','dev_product_tags'],
   "data"                 :  [
                              'views/woc_config_views.xml',
                              'data/import_cron.xml',

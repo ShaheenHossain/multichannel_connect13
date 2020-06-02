@@ -702,7 +702,15 @@ class MultiChannelSale(models.Model):
             map_domain += [('store_category_id', '=', store_category_id)]
         if odoo_category_id:
             map_domain += [('odoo_category_id', '=', odoo_category_id)]
-        return self.env['channel.category.mappings'].search(map_domain, limit=limit)
+        return self.env['channel.category.mappings'].search(map_domain, limit=limit)\
+
+    @api.model
+    def match_tag_mappings(self, store_tag_id=None,domain=None, limit=1):
+        map_domain = self.get_channel_domain(domain)
+        if store_tag_id:
+            map_domain += [('store_tag_id', '=', store_tag_id)]
+
+        return self.env['channel.tag.mappings'].search(map_domain, limit=limit)
 
 
     @api.model
@@ -904,6 +912,17 @@ class MultiChannelSale(models.Model):
         channel_vals = self.get_channel_vals()
         vals.update(channel_vals)
         return self.env['channel.category.mappings'].create(vals)
+
+    @api.model
+    def create_tag_mapping(self, crt_id, store_id):
+        self.ensure_one()
+        vals = dict(
+            store_tag_id=store_id,
+            tag_name=crt_id.id,
+        )
+        channel_vals = self.get_channel_vals()
+        vals.update(channel_vals)
+        return self.env['channel.tag.mappings'].create(vals)
 
 
     @api.model

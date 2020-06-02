@@ -93,3 +93,16 @@ class ChannelProductMappings(models.Model):
     def change_odoo_id(self):
         self.erp_product_id = self.product_name.id
         self.odoo_template_id = self.product_name.product_tmpl_id.id
+
+class ChannelTagMappings(models.Model):
+    _name='channel.tag.mappings'
+    _inherit=['channel.mappings']
+
+    store_tag_id = fields.Char(
+        string='Store Tag ID',
+        required=True)
+    tag_name = fields.Many2one(
+        comodel_name='product.tags',
+        string='Tag',
+        required=True
+    )

@@ -187,3 +187,5 @@ class MultiChannelSale(models.Model):
 				count+=self.import_stock(product,product_mappings)
 		message = str(count) + " Product(s) Stock Imported!"
 		return self.display_message(message)
+
+

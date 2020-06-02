@@ -22,8 +22,9 @@ Fields = [
 ]
 CategoryFields = Fields + [
     'parent_id',
-    'description'
-]
+    'description']
+
+TagFields = Fields + ['name',]
 ProductFields = Fields + [
     'extra_categ_ids',
     'list_price',
@@ -98,6 +99,10 @@ class WkFeed(models.Model):
     @api.model
     def get_category_fields(self):
         return copy.deepcopy(CategoryFields)
+
+    @api.model
+    def get_tag_fields(self):
+        return copy.deepcopy(TagFields)
 
     @api.multi
     def open_mapping_view(self):
@@ -642,9 +647,10 @@ class ProductVaraintFeed(models.Model):
     width = fields.Char(
         string='Width',
     )
-    height = fields.Char(
-        string='Height',
-    )
+    height = fields.Char(string='Height',)
+
+    tag_ids=fields.Many2many("product.tags", string="Tags")
+
     dimensions_unit = fields.Char(
         string='Dimensions Unit Name',
     )
@@ -1176,3 +1182,110 @@ class ProductFeed(models.Model):
             except Exception as e:
                 _logger.info("====>>Error Importing Feed %r", (record, e))
         return True
+
+
+class TagsFeed(models.Model):
+    _name="tags.feed"
+    _inherit = ["wk.feed"]
+
+    name=fields.Char(String="Name")
+
+    @api.multi
+    def import_tag(self, channel_id):
+        self.ensure_one()
+        message = ""
+        create_id = None
+        update_id = None
+        context = dict(self._context)
+
+        vals = EL(self.read(self.get_tag_fields()))
+        store_id = vals.pop('store_id')
+        match = channel_id.match_tag_mappings(store_id)
+
+        state = 'done'
+        if not vals.get('name'):
+            message += "<br/>Tag without name can't evaluated"
+            state = 'error'
+        if not store_id:
+            message += "<br/>Tag without store ID can't evaluated"
+            state = 'error'
+
+        vals.pop('description', None)
+        # vals.pop('website_message_ids', '')
+        # vals.pop('message_follower_ids', '')
+
+        if match:
+            if state == 'done':
+                update_id = match
+                try:
+                    match.tag_name.write(vals)
+                    message += '<br/> Tag %s successfully updated' % (
+                        vals.get('name', ''))
+                except Exception as e:
+                    _logger.error('#TagError2 %r', e)
+                    message += '<br/>%s' % (e)
+                    state = 'error'
+            elif state == 'error':
+                message += '<br/>Error while Tag update.'
+
+        else:
+            if state == 'done':
+                try:
+                    crt_id = self.env['product.tags'].create(vals)
+                    create_id = channel_id.create_tag_mapping(
+                        crt_id, store_id)
+                    message += '<br/> Tag %s Successfully Evaluate' % (
+                        vals.get('name', ''))
+                except Exception as e:
+                    _logger.error('#TagError3 %r', e)
+                    message += '<br/>%s' % (e)
+                    state = 'error'
+
+        self.set_feed_state(state=state)
+        self.message = "%s <br/> %s" % (self.message, message)
+        return dict(
+            create_id=create_id,
+            update_id=update_id,
+            message=message
+        )
+
+
+    @api.multi
+    def import_items(self):
+        update_ids = []
+        create_ids = []
+
+        message = ''
+
+        for record in self:
+            sync_vals = dict(
+                status='error',
+                action_on='tag',
+                action_type='import',
+            )
+            channel_id = record.channel_id
+            res = record.import_tag(channel_id)
+            msz = res.get('message', '')
+            message += msz
+            update_id = res.get('update_id')
+            if update_id:
+                update_ids.append(update_id)
+            create_id = res.get('create_id')
+            if create_id:
+                create_ids.append(create_id)
+            mapping_id = update_id or create_id
+            if mapping_id:
+                mapping_vals = mapping_id.read(['store_tag_id', 'tag_name'])[0]
+                sync_vals['status'] = 'success'
+                sync_vals['ecomstore_refrence'] = mapping_vals.get('store_tag_id')
+                odoo_id = mapping_vals.get('tag_name')
+                sync_vals['odoo_id'] = odoo_id[0]
+            sync_vals['summary'] = msz
+            record.channel_id._create_sync(sync_vals)
+        if self._context.get('get_mapping_ids'):
+            return dict(
+                update_ids=update_ids,
+                create_ids=create_ids,
+            )
+        message = self.get_feed_result(feed_type='Tag')
+        return self.env['multi.channel.sale'].display_message(message)
