@@ -40,6 +40,7 @@ ProductFields = Fields + [
     'sale_delay',
     'qty_available',
     'weight',
+    'tag_ids',
     'feed_variants',
     'weight_unit',
     'length',
@@ -1006,6 +1007,9 @@ class ProductFeed(models.Model):
                         extra_categ = extra_categ.with_context(context).write(data)
                     else:
                         state = 'error'
+                if vals.get('tag_ids'):
+                    tag_ids=vals.pop('tag_ids')
+                    template_id.tag_ids=[(6, 0,tag_ids)]
                 if len(variant_lines):
                     context['wk_qty_update'] = False
                     res = self.with_context(context).update_product_variants(
@@ -1019,8 +1023,7 @@ class ProductFeed(models.Model):
                         self.wk_change_product_price(
                             product_id=variant_id,
                             price=list_price,
-                            channel_id=channel_id
-                        )
+                            channel_id=channel_id)
                         if qty_available and eval(qty_available) > 0:
                             self.wk_change_product_qty(
                                 variant_id, qty_available, location_id)
@@ -1059,6 +1062,9 @@ class ProductFeed(models.Model):
                                 template_id = self.env['product.template'].with_context(context).create(vals)
                             else:
                                 state = 'error'
+                        if vals.get('tag_ids'):
+                            tag_ids = vals.pop('tag_ids')
+                            template_id.tag_ids = [(6, 0, tag_ids)]
                         else:
                             template_id = self.env['product.template'].with_context(context).create(vals)
                     else:
@@ -1080,6 +1086,10 @@ class ProductFeed(models.Model):
                             else:
                                 state = 'error'
                                 template_id = None
+
+                        if vals.get('tag_ids'):
+                            tag_ids = vals.pop('tag_ids')
+                            template_id.tag_ids = [(6, 0, tag_ids)]
 
                     if len(variant_lines) and template_id:
                         res = self._create_product_lines(

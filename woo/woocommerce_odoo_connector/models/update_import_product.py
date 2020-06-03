@@ -38,6 +38,8 @@ class MultiChannelSale(models.Model):
 		count = 0
 		self.import_woocommerce_attribute()
 		self.import_woocommerce_categories()
+		self.import_all_tags()
+
 		if not woocommerce:
 			woocommerce = self.get_woocommerce_connection()
 		product_tmpl = self.env['product.feed']
@@ -65,6 +67,8 @@ class MultiChannelSale(models.Model):
 				for product in product_data:
 					_logger.info("========test===2===========>%r",[product['id']])
 					variants = []
+					tag_ids = []
+
 					update_record = product_tmpl.search([('store_id','=',product['id']),('channel_id.id','=',self.id)])
 					if update_record:
 						count += 1
@@ -79,6 +83,11 @@ class MultiChannelSale(models.Model):
 							if category_id:
 								# categ = categ+str(category_id.store_id)+","
 								categ = str(category_id.store_id)
+						for tag in product['tags']:
+							tag_mappings = self.env['channel.tag.mappings'].search(
+								[('store_tag_id', '=', tag['id'])])
+							tags = tag_mappings.tag_name.id
+							tag_ids.append(tags)
 						try:
 							product['price']=float(product['price'])
 						except:
@@ -94,6 +103,7 @@ class MultiChannelSale(models.Model):
 											'image_url'				: product['images'][0]['src'],
 											'extra_categ_ids'		: categ,
 											'weight'				: product['weight'],
+											 'tag_ids'				: [(6, 0,tag_ids)],
 											# 'weight_unit'			: 'kg',
 											'length'				: product['dimensions']['length'],
 											'width'					: product['dimensions']['width'],
@@ -114,6 +124,13 @@ class MultiChannelSale(models.Model):
 							if category_id:
 								# categ = categ+str(category_id.store_id)+","
 								categ = str(category_id.store_id)
+
+						for tag in product['tags']:
+							tag_ids = []
+							tag_mappings = self.env['channel.tag.mappings'].search(
+								[('store_tag_id', '=', tag['id'])])
+							tags = tag_mappings.tag_name.id
+							tag_ids.append(tags)
 						try:
 							product['price']=float(product['price'])
 						except:
@@ -130,6 +147,7 @@ class MultiChannelSale(models.Model):
 										'image_url'				: product['images'][0]['src'],
 										'extra_categ_ids'		: categ,
 										'ecom_store'			: 'woocommerce',
+										'tag_ids'			: [(6, 0,tag_ids)],
 										'weight'				: product['weight'],
 										# 'weight_unit'			: 'kg',
 										'length'				: product['dimensions']['length'],

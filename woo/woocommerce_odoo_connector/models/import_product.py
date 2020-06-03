@@ -204,6 +204,7 @@ class MultiChannelSale(models.Model):
                         i = i+1
                         for product in product_data:
                             variants = []
+                            tag_ids = []
                             if not self.env['channel.template.mappings'].search([('store_product_id','=',product['id']),('channel_id.id','=',self.id)]):
                                 categ = ""
                                 if product['type'] == 'variable':
@@ -214,7 +215,6 @@ class MultiChannelSale(models.Model):
                                     if category_id:
                                         categ = categ+str(category_id.store_category_id)+","
                                 for tag in product['tags']:
-                                    tag_ids=[]
                                     tag_mappings = self.env['channel.tag.mappings'].search(
                                         [('store_tag_id', '=', tag['id'])])
                                     tags = tag_mappings.tag_name.id
@@ -304,6 +304,7 @@ class MultiChannelSale(models.Model):
                         i = i+1
                         for product in product_data:
                             variants = []
+                            tag_ids = []
                             if not self.env['channel.template.mappings'].search([('store_product_id','=',product['id']),('channel_id.id','=',self.id)]):
                                 categ = ""
                                 if product['type'] == 'variable':
@@ -313,6 +314,11 @@ class MultiChannelSale(models.Model):
                                     category_id = self.env['category.feed'].search([('name','=',category),('channel_id.id','=',self.id)])
                                     if category_id:
                                         categ = categ+str(category_id.store_id)+","
+                                for tag in product['tags']:
+                                    tag_mappings = self.env['channel.tag.mappings'].search(
+                                        [('store_tag_id', '=', tag['id'])])
+                                    tags = tag_mappings.tag_name.id
+                                    tag_ids.append(tags)
                                 try:
                                     product['price']=float(product['price'])
                                 except:
@@ -326,6 +332,7 @@ class MultiChannelSale(models.Model):
                                                 'qty_available' 		: product['stock_quantity'],
                                                 'feed_variants' 		: variants,
                                                 'image_url'				: product['images'][0]['src'],
+                                                'tag_ids'		        : [(6, 0,tag_ids)],
                                                 'extra_categ_ids'		: categ,
                                                 # 'ecom_store'			: 'woocommerce',
                                                 }
@@ -381,6 +388,8 @@ class MultiChannelSale(models.Model):
             raise UserError(_("Error : "+str(product['message'])))
         else :
             variants = []
+            tag_ids = []
+
             if not self.env['channel.template.mappings'].search([('store_product_id','=',product['id']),('channel_id.id','=',self.id)]):
                 categ = ""
                 if product['type'] == 'variable':
@@ -389,6 +398,11 @@ class MultiChannelSale(models.Model):
                     category_id = self.env['category.feed'].search([('name','=',category),('channel_id.id','=',self.id)])
                     if category_id:
                         categ = categ+str(category_id.store_id)+","
+                for tag in product['tags']:
+                    tag_mappings = self.env['channel.tag.mappings'].search(
+                        [('store_tag_id', '=', tag['id'])])
+                    tags = tag_mappings.tag_name.id
+                    tag_ids.append(tags)
                 try:
                     product['price']=float(product['price'])
                 except:
@@ -403,6 +417,7 @@ class MultiChannelSale(models.Model):
                                 'feed_variants' 		: variants,
                                 'image_url'				: product['images'][0]['src'],
                                 'extra_categ_ids'		: categ,
+                                'tag_ids'		        : [(6, 0,tag_ids)],
                                 # 'ecom_store'			: 'woocommerce',
                                 }
                 if product['downloadable'] == True or product['virtual'] == True:

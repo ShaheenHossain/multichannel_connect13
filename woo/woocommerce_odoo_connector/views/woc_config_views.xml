@@ -65,6 +65,20 @@
 								<span>  Import/Update Orders  </span> <span> <i class='fa fa-fw fa-cloud-download'/></span>
 							</button>
 						</div>
+						<div>
+							<button
+									attrs= "{'invisible':['!',('channel','!=', 'WooCommerce'),('state','!=','validate')]}"
+									name="import_all_tags"
+									type="object"
+									class="oe_highlight wk_operation_btn box oe_left"
+									style="height:100px;margin:10px 5px;"
+									icon="fa-6x fa-tags"
+									aria-label="Import Tags"
+									title="Import Tags"
+									help="It will import Tags on Odoo from WooCommerce">
+								<span> Import Product Tags</span> <span> <i class='fa fa-fw fa-cloud-download'/></span>
+							</button>
+						</div>
 					</group>
 					<!-- Export -->
 					<separator string="Export To WooCommerce"  colspan="4" attrs="{'invisible':[('channel','!=','woocommerce')]}" />
@@ -114,14 +128,27 @@
 									type="action"
 									class="oe_highlight wk_operation_btn box oe_left"
 									style="height:100px;margin:0 5px;"
-									icon="fa-5x fa-shopping-cart"
+									icon="fa-6x fa-shopping-cart"
 									aria-label="Export Orders"
 									title="Export Orders"
 									help="It will Update Orders status from Odoo to WooCommerce">
 								<span>    Update Orders   </span> <span> <i class='fa fa-fw fa-cloud-upload'/></span>
 							</button>
 						</div>
-
+						<div>
+							<button
+									attrs= "{'invisible':['!',('channel','!=', 'WooCommerce'),('state','!=','validate')]}"
+									name="export_tags"
+									type="object"
+									class="oe_highlight wk_operation_btn box oe_left"
+									style="height:100px;margin:10px 5px;"
+									icon="fa-6x fa-tags"
+									aria-label="Export Tags"
+									title="Export Tags"
+									help="It will export Tags on Odoo from WooCommerce">
+								<span> Export Product Tags</span> <span> <i class='fa fa-fw fa-cloud-upload'/></span>
+							</button>
+						</div>
 					</group>
 				</xpath>
 				<group name='credentials'  position="inside">

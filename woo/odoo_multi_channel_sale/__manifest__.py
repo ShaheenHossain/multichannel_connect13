@@ -36,6 +36,7 @@
                              'views/category_skeleton_view.xml',
                              'views/account_skeleton_view.xml',
                              'views/product_skeleton_view.xml',
+                             'views/tag_skeleton_view.xml',
                              'views/partner_skeleton_view.xml',
                              'views/order_skeleton_view.xml',
                              'views/pricelist_skeleton_view.xml',

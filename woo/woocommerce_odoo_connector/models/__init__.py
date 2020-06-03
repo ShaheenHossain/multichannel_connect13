@@ -18,3 +18,4 @@ from . import import_taxes
 from . import woc_config
 from . import export_order
 from . import import_update_tag
+from . import export_update_tag

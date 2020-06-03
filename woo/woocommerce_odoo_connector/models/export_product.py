@@ -265,7 +265,7 @@ class MultiChannelSale(models.Model):
 						'sku' 				: template.default_code or "",
 						'regular_price'		: str(template.with_context(pricelist=self.pricelist_name.id).price) or "",
 						'type'				: 'simple',
-						# 'categories'		: self.set_woocommerce_product_categories(template),
+						'categories'		: self.set_woocommerce_product_categories(template),
 						'status'			: 'publish',
 						'short_description'	: template.description_sale  or "" ,
 						'description'		: template.description or "",

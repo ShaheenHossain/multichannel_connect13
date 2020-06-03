@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        <record id="channel_tag_mappings_form" model="ir.ui.view">
+            <field name="name">channel.tag.mappings.form</field>
+            <field name="model">channel.tag.mappings</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form >
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name='channel_id'/>
+                                <field name='ecom_store'/>
+                            </group>
+                            <group>
+                                <field name="operation"/>
+                            </group>
+                        </group>
+                        <group col="4">
+                            <field name='store_tag_id'/>
+                            <field name='tag_name'/>
+                        </group>
+                    </sheet>
+
+                </form>
+            </field>
+        </record>
+
+        <record id="channel_tag_mappings_tree" model="ir.ui.view">
+            <field name="name">channel.tag.mappings.tree</field>
+            <field name="model">channel.tag.mappings</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                <tree string="Channel Template Mapping">
+                    <field name="channel_id"/>
+                    <field name="store_tag_id"/>
+                    <field name="tag_name"/>
+                    <field name="operation"/>
+                    <!--                    <field name="create_date"/>-->
+                    <!--                    <field name="write_date"/>-->
+                </tree>
+            </field>
+        </record>
+        <record id="channel_tag_mapping_action_id" model="ir.actions.act_window">
+            <field name="name">Channel Tag Mappings</field>
+            <field name="res_model">channel.tag.mappings</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="channel_tag_mappings_tree"/>
+            <field name="context">{"search_default_filter_by_ecom_store":1,"search_default_filter_by_channel_id":1}</field>
+        </record>
+    </data>
+</openerp>
