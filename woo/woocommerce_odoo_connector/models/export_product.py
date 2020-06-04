@@ -19,7 +19,8 @@ class MultiChannelSale(models.Model):
 	@api.multi
 	def action_export_woocommerce_products(self):
 		self.sudo().export_woocommerce_attributes_values()
-		self.sudo().export_woocommerce_categories(0)
+		# self.sudo().export_woocommerce_categories(0)
+		self.export_tags()
 		woocommerce = self.get_woocommerce_connection()
 		count = 0
 		template_ids = []
@@ -210,6 +211,7 @@ class MultiChannelSale(models.Model):
 						'images'			: self.create_woocommerce_product_image(template,True),
 						'type'				: 'variable',
 						'categories'		: self.set_woocommerce_product_categories(template),
+						'tags'				: self.set_woocommerce_product_tags(template),
 						'status'			: 'publish',
 						'manage_stock'		: False,
 						'attributes'		: self.set_woocommerce_attribute_line(template),
@@ -266,6 +268,7 @@ class MultiChannelSale(models.Model):
 						'regular_price'		: str(template.with_context(pricelist=self.pricelist_name.id).price) or "",
 						'type'				: 'simple',
 						'categories'		: self.set_woocommerce_product_categories(template),
+						'tags'				: self.set_woocommerce_product_tags(template),
 						'status'			: 'publish',
 						'short_description'	: template.description_sale  or "" ,
 						'description'		: template.description or "",
@@ -347,9 +350,26 @@ class MultiChannelSale(models.Model):
 		return categ_list
 
 	@api.multi
+	def set_woocommerce_product_tags(self,template):
+		tag_list=[]
+		if template.tag_ids:
+			for tag in template.tag_ids:
+				tag_mapping=self.env['channel.tag.mappings'].search([('tag_name.id','=',tag.id),('channel_id.id','=',self.id)])
+				if tag_mapping:
+					tag_dict={
+						'id': int(tag_mapping.store_tag_id),
+						'name': str(tag_mapping.tag_name.name)
+					}
+					tag_list.append(tag_dict)
+
+		return tag_list
+
+
+	@api.multi
 	def export_woocommerce_product(self):
 		self.export_woocommerce_attributes_values()
 		self.export_woocommerce_categories(0)
+		self.export_tags()
 		# message = self.export_update_woocommerce_product()
 		message =""
 		woocommerce = self.get_woocommerce_connection()

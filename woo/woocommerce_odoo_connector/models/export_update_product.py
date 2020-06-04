@@ -21,6 +21,7 @@ class MultiChannelSale(models.Model):
 		count = 0
 		self.export_woocommerce_categories(0)
 		self.export_all_woocommerce_attribute_values()
+		self.export_tags()
 		template_mapping = self.env['channel.template.mappings'].search([('need_sync','=','yes'),('channel_id.id','=',self.id)])
 		for check in template_mapping:
 			count=len(template_mapping)
@@ -70,6 +71,7 @@ class MultiChannelSale(models.Model):
 
 	@api.multi
 	def action_update_woocommerce_products(self):
+		self.export_tags()
 		template_ids = []
 		message = ''
 		if 'active_ids' in self._context:
@@ -139,6 +141,7 @@ class MultiChannelSale(models.Model):
 								'regular_price'		: str(template.with_context(pricelist=self.pricelist_name.id).price) or "",
 								'attributes'		: self.set_woocommerce_attribute_line(template),
 								'categories'		: self.set_woocommerce_product_categories(template) or "",
+								'tags'				: self.set_woocommerce_product_tags(template) or "",
 								'short_description'	: template.description_sale  or "" ,
 								'description'		: template.description or "",
 								'price'				: template.with_context(pricelist=self.pricelist_name.id).price,
@@ -174,6 +177,7 @@ class MultiChannelSale(models.Model):
 								'attributes'		: self.set_woocommerce_attribute_line(template),
 								'default_attributes': self.get_woocommerce_attribute_dict(template.product_variant_ids[0]),
 								'categories'		: self.set_woocommerce_product_categories(template),
+								'tags'				: self.set_woocommerce_product_tags(template),
 								'short_description'	: template.description_sale  or "" ,
 								'description'		: template.description or "",
 								'price'				: template.with_context(pricelist=self.pricelist_name.id).price,
@@ -219,6 +223,7 @@ class MultiChannelSale(models.Model):
 								'attributes'		: self.set_woocommerce_attribute_line(template),
 								'default_attributes': self.get_woocommerce_attribute_dict(template.product_variant_ids[0]),
 								'categories'		: self.set_woocommerce_product_categories(template),
+								'tags'				: self.set_woocommerce_product_tags(template),
 								'short_description'	: template.description_sale  or "" ,
 								'description'		: template.description or "",
 								'price'				: template.with_context(pricelist=self.pricelist_name.id).price,
@@ -300,6 +305,7 @@ class MultiChannelSale(models.Model):
 								'attributes'		: self.set_woocommerce_attribute_line(template),
 								'default_attributes': self.get_woocommerce_attribute_dict(template.product_variant_ids[0]),
 								'categories'		: self.set_woocommerce_product_categories(template),
+								'tags'				: self.set_woocommerce_product_tags(template),
 								'short_description'	: template.description_sale  or "" ,
 								'description'		: template.description or "",
 								'price'				: template.with_context(pricelist=self.pricelist_name.id).price,
